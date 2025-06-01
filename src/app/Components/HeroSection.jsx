@@ -1,10 +1,21 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const HeroSection = () => {  const handleMergeClick = () => {
+const HeroSection = ({ onNavigate }) => {
+  const handleMergeClick = () => {
     console.log("Merge Your PDFs Now clicked!");
-    // Navigate to the tool or start the merge process
-    window.location.href = '/merge';
+    // Navigate to the merger tool
+    if (onNavigate) {
+      onNavigate('merger');
+    }
+  };
+
+  const handleBuilderClick = () => {
+    console.log("Create PDF clicked!");
+    // Navigate to the enhanced PDF builder
+    if (onNavigate) {
+      onNavigate('builder');
+    }
   };
 
   const handleDemoClick = () => {
@@ -31,17 +42,16 @@ const HeroSection = () => {  const handleMergeClick = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-center lg:text-left"
-          >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#E1E6EB] leading-tight mb-4 sm:mb-6">
-              The Ultimate PDF Merger.{" "}
+          >            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#E1E6EB] leading-tight mb-4 sm:mb-6">
+              The Ultimate PDF Tool.{" "}
               <span className="text-[#00A99D] block sm:inline">
-                Seamless, Secure, Powerful.
+                Merge, Build & Design.
               </span>
             </h1>
             <p className="text-lg sm:text-xl text-[#A0AEC0] mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              Merge, organize, and optimize your PDF files with advanced
-              features built for professionals and businesses. Experience
-              unmatched control and quality.
+              Merge PDFs instantly or create stunning documents with our advanced 
+              grid-based layout system. Upload images, arrange them precisely, 
+              and export professional PDFs.
             </p>{" "}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8 justify-center lg:justify-start">
               <motion.button
@@ -50,28 +60,27 @@ const HeroSection = () => {  const handleMergeClick = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Merge Your PDFs Now
+                Merge PDFs
               </motion.button>
 
               <motion.button
-                onClick={handleDemoClick}
+                onClick={handleBuilderClick}
                 className="border-2 border-[#00A99D] text-[#00A99D] hover:bg-[#00A99D] hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all duration-300 order-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Watch Demo
+                Create PDF
               </motion.button>
-            </div>
-            <div className="text-xs sm:text-sm text-[#A0AEC0] text-center lg:text-left">
+            </div>            <div className="text-xs sm:text-sm text-[#A0AEC0] text-center lg:text-left">
               <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 justify-center lg:justify-start">
                 <span className="flex items-center justify-center lg:justify-start">
-                  ✓ No credit card required for trial
+                  ✓ Advanced grid layout system
                 </span>
                 <span className="flex items-center justify-center lg:justify-start">
-                  ✓ Process unlimited files
+                  ✓ Drag & drop interface
                 </span>
                 <span className="flex items-center justify-center lg:justify-start">
-                  ✓ Military-grade security
+                  ✓ Professional PDF output
                 </span>
               </div>
             </div>

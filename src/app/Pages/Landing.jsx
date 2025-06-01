@@ -9,17 +9,17 @@ import SupportSection from "../Components/SupportSection";
 import FinalCTA from "../Components/FinalCTA";
 import Footer from "../Components/Footer";
 
-const Landing = () => {
+const Landing = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-[#1B212C]">
-      <Navbar />
-      <HeroSection />
+      <Navbar onNavigate={onNavigate} />
+      <HeroSection onNavigate={onNavigate} />
       <HowItWorks />
       <PremiumFeatures />
       <UseCases />
       <PricingSection />
       <SupportSection />
-      <FinalCTA />
+      <FinalCTA onNavigate={onNavigate} />
       <Footer />
     </div>
   );

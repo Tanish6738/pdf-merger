@@ -1,10 +1,21 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-const Navbar = () => {
+const Navbar = ({ onNavigate }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const handleNavClick = (sectionId) => {
+    // Handle navigation to different app views
+    const appViews = ['merger', 'builder', 'advanced-tools', 'cloud', 'security', 'analytics', 'export', 'settings'];
+    
+    if (appViews.includes(sectionId)) {
+      if (onNavigate) {
+        onNavigate(sectionId);
+      }
+      setIsMenuOpen(false);
+      return;
+    }
+
+    // Handle scrolling to sections on landing page
     const element = document.getElementById(sectionId);
     if (element) {
       const offsetTop = element.offsetTop - 80; // Account for navbar height
@@ -70,41 +81,65 @@ const Navbar = () => {
           </div>{" "}          {/* Desktop Navigation */}
           <div className="hidden lg:block">
             <div className="ml-10 flex items-baseline space-x-6 xl:space-x-8">
-              <a
-                href="/merge"
-                className="text-[#E1E6EB] hover:text-[#00A99D] px-3 py-2 text-sm font-medium transition-colors"
-              >
-                Merge Tool
-              </a>
+              {/* PDF Tools Dropdown */}
+              <div className="relative group">
+                <button className="text-[#E1E6EB] hover:text-[#00A99D] px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                  PDF Tools
+                  <svg className="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <div className="absolute left-0 mt-2 w-48 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <button
+                    onClick={() => handleNavClick("merger")}
+                    className="block w-full text-left px-4 py-2 text-sm text-[#E1E6EB] hover:text-[#00A99D] hover:bg-[#00A99D]/10"
+                  >
+                    PDF Merger
+                  </button>
+                  <button
+                    onClick={() => handleNavClick("builder")}
+                    className="block w-full text-left px-4 py-2 text-sm text-[#E1E6EB] hover:text-[#00A99D] hover:bg-[#00A99D]/10"
+                  >
+                    PDF Builder
+                  </button>
+                  <button
+                    onClick={() => handleNavClick("advanced-tools")}
+                    className="block w-full text-left px-4 py-2 text-sm text-[#E1E6EB] hover:text-[#00A99D] hover:bg-[#00A99D]/10"
+                  >
+                    Advanced Tools
+                  </button>
+                </div>
+              </div>
+
               <button
-                onClick={() => handleNavClick("features")}
+                onClick={() => handleNavClick("cloud")}
                 className="text-[#E1E6EB] hover:text-[#00A99D] px-3 py-2 text-sm font-medium transition-colors"
               >
-                Features
+                Cloud
               </button>
               <button
-                onClick={() => handleNavClick("pricing")}
+                onClick={() => handleNavClick("security")}
                 className="text-[#E1E6EB] hover:text-[#00A99D] px-3 py-2 text-sm font-medium transition-colors"
               >
-                Pricing
+                Security
               </button>
               <button
-                onClick={() => handleNavClick("use-cases")}
+                onClick={() => handleNavClick("analytics")}
                 className="text-[#E1E6EB] hover:text-[#00A99D] px-3 py-2 text-sm font-medium transition-colors"
               >
-                Use Cases
+                Analytics
               </button>
               <button
-                onClick={handleSupportClick}
+                onClick={() => handleNavClick("export")}
                 className="text-[#E1E6EB] hover:text-[#00A99D] px-3 py-2 text-sm font-medium transition-colors"
               >
-                Support
+                Export
               </button>
               <button
-                onClick={() => handleAuthClick("login")}
+                onClick={() => handleNavClick("settings")}
                 className="text-[#E1E6EB] hover:text-[#00A99D] px-3 py-2 text-sm font-medium transition-colors"
               >
-                Login
+                Settings
               </button>
             </div>
           </div>{" "}
@@ -158,42 +193,64 @@ const Navbar = () => {
             exit={{ opacity: 0, height: 0 }}
           >
             {" "}            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-[#1B212C]/95 backdrop-blur-sm border-t border-[#A0AEC0]/10">
-              <a
-                href="/merge"
-                className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
-              >
-                Merge Tool
-              </a>
-              <button
-                onClick={() => handleNavClick("features")}
-                className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
-              >
-                Features
-              </button>
-              <button
-                onClick={() => handleNavClick("pricing")}
-                className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
-              >
-                Pricing
-              </button>
-              <button
-                onClick={() => handleNavClick("use-cases")}
-                className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
-              >
-                Use Cases
-              </button>
-              <button
-                onClick={handleSupportClick}
-                className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
-              >
-                Support
-              </button>
-              <button
-                onClick={() => handleAuthClick("login")}
-                className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
-              >
-                Login
-              </button>
+              {/* PDF Tools Section */}
+              <div className="border-b border-[#A0AEC0]/10 pb-2 mb-2">
+                <p className="text-[#A0AEC0] text-sm font-medium px-3 py-1 uppercase tracking-wide">PDF Tools</p>
+                <button
+                  onClick={() => handleNavClick("merger")}
+                  className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
+                >
+                  PDF Merger
+                </button>
+                <button
+                  onClick={() => handleNavClick("builder")}
+                  className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
+                >
+                  PDF Builder
+                </button>
+                <button
+                  onClick={() => handleNavClick("advanced-tools")}
+                  className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
+                >
+                  Advanced Tools
+                </button>
+              </div>
+
+              {/* Features Section */}
+              <div className="border-b border-[#A0AEC0]/10 pb-2 mb-2">
+                <p className="text-[#A0AEC0] text-sm font-medium px-3 py-1 uppercase tracking-wide">Features</p>
+                <button
+                  onClick={() => handleNavClick("cloud")}
+                  className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
+                >
+                  Cloud Integration
+                </button>
+                <button
+                  onClick={() => handleNavClick("security")}
+                  className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
+                >
+                  Security Features
+                </button>
+                <button
+                  onClick={() => handleNavClick("analytics")}
+                  className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
+                >
+                  Analytics
+                </button>
+                <button
+                  onClick={() => handleNavClick("export")}
+                  className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
+                >
+                  Export & Sharing
+                </button>
+                <button
+                  onClick={() => handleNavClick("settings")}
+                  className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
+                >
+                  Settings
+                </button>
+              </div>
+
               <div className="pt-2">
                 <button
                   onClick={() => handleAuthClick("trial")}
