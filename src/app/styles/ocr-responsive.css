@@ -1,0 +1,117 @@
+/* Enhanced responsive styles for OCR processor */
+
+/* Custom slider styles for better mobile experience */
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #00A99D;
+  border: 2px solid #1B212C;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: #00B8AC;
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #00A99D;
+  border: 2px solid #1B212C;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+  background: #00B8AC;
+  transform: scale(1.1);
+}
+
+/* Enhanced touch targets for mobile */
+@media (max-width: 640px) {
+  .slider::-webkit-slider-thumb {
+    height: 24px;
+    width: 24px;
+  }
+  
+  .slider::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+  }
+  
+  /* Larger tap targets for buttons */
+  button {
+    min-height: 44px;
+  }
+  
+  /* Better spacing for mobile checkboxes */
+  input[type="checkbox"] {
+    min-width: 18px;
+    min-height: 18px;
+  }
+}
+
+/* Smooth animations for mobile interactions */
+@media (max-width: 768px) {
+  .transition-colors {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Improved scrolling for mobile */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better text selection on mobile */
+  pre {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+}
+
+/* Custom scrollbar for better mobile experience */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1B212C;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00A99D;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00B8AC;
+}
+
+/* Responsive grid improvements */
+@media (max-width: 1280px) {
+  .xl\:grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Enhanced button focus states for accessibility */
+button:focus {
+  outline: 2px solid #00A99D;
+  outline-offset: 2px;
+}
+
+/* Improved card shadows on mobile */
+@media (max-width: 640px) {
+  .rounded-xl {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+}

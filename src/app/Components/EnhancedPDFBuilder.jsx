@@ -466,7 +466,6 @@ const EnhancedPDFBuilder = () => {
         : page
     ));
   }, [currentPage, saveToHistory]);
-
   const handleImageFitModeChange = useCallback((cellId, imageDataId, newFitMode) => {
     const currentPageData = getCurrentPage();
     const cellImages = currentPageData.cellImages?.[cellId] || [];
@@ -477,16 +476,23 @@ const EnhancedPDFBuilder = () => {
     const imageInfo = images.find(img => img.id === imageData.imageId);
     if (!imageInfo) return;
 
-    // Recalculate position and size based on new fit mode
-    const { calculateImageFit } = require('../utils/imageHelpers');
+    // Calculate cell dimensions based on page layout
+    const { generateGridCells } = require('../utils/imageHelpers');
+    const gridCells = generateGridCells(
+      currentPageData.layout, 
+      currentPageData.customGrid, 
+      { width: 800, height: 600 } // Default canvas size
+    );
     
-    // Get cell dimensions (would need to be passed from the canvas component)
-    const cellWidth = 200; // Default, should be dynamic
-    const cellHeight = 200; // Default, should be dynamic
-    
-    const fittedPosition = calculateImageFit(
-      { width: imageInfo.width || 200, height: imageInfo.height || 200 },
-      { width: cellWidth, height: cellHeight },
+    const cell = gridCells.find(c => c.id === cellId);
+    if (!cell) return;
+
+    // Apply the new fit mode
+    const { applyFitMode } = require('../utils/imageHelpers');
+    const updatedImageData = applyFitMode(
+      imageData,
+      imageInfo,
+      { width: cell.width, height: cell.height },
       newFitMode
     );
     
@@ -497,16 +503,7 @@ const EnhancedPDFBuilder = () => {
             cellImages: {
               ...page.cellImages,
               [cellId]: page.cellImages?.[cellId]?.map(img => 
-                img.id === imageDataId
-                  ? { 
-                      ...img, 
-                      fitMode: newFitMode,
-                      width: fittedPosition.width,
-                      height: fittedPosition.height,
-                      x: fittedPosition.x,
-                      y: fittedPosition.y
-                    }
-                  : img
+                img.id === imageDataId ? updatedImageData : img
               ) || []
             }
           }

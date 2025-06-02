@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 
 const Navbar = ({ onNavigate }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const handleNavClick = (sectionId) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);  const handleNavClick = (sectionId) => {
     // Handle navigation to different app views
-    const appViews = ['merger', 'builder', 'advanced-tools', 'cloud', 'security', 'analytics', 'export', 'settings'];
+    const appViews = ['merger', 'builder', 'simple-builder', 'advanced-tools', 'cloud', 'security', 'analytics', 'export', 'settings'];
     
     if (appViews.includes(sectionId)) {
       if (onNavigate) {
@@ -89,18 +88,29 @@ const Navbar = ({ onNavigate }) => {
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                 </button>
-                <div className="absolute left-0 mt-2 w-48 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <button
+                <div className="absolute left-0 mt-2 w-48 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">                  <button
                     onClick={() => handleNavClick("merger")}
                     className="block w-full text-left px-4 py-2 text-sm text-[#E1E6EB] hover:text-[#00A99D] hover:bg-[#00A99D]/10"
                   >
                     PDF Merger
                   </button>
                   <button
+                    onClick={() => handleNavClick("split-pdf")}
+                    className="block w-full text-left px-4 py-2 text-sm text-[#E1E6EB] hover:text-[#00A99D] hover:bg-[#00A99D]/10"
+                  >
+                    Split PDF
+                  </button>
+                  <button
                     onClick={() => handleNavClick("builder")}
                     className="block w-full text-left px-4 py-2 text-sm text-[#E1E6EB] hover:text-[#00A99D] hover:bg-[#00A99D]/10"
                   >
-                    PDF Builder
+                    PDF Builder (Advanced)
+                  </button>
+                  <button
+                    onClick={() => handleNavClick("simple-builder")}
+                    className="block w-full text-left px-4 py-2 text-sm text-[#E1E6EB] hover:text-[#00A99D] hover:bg-[#00A99D]/10"
+                  >
+                    Images to PDF (Simple)
                   </button>
                   <button
                     onClick={() => handleNavClick("advanced-tools")}
@@ -195,12 +205,17 @@ const Navbar = ({ onNavigate }) => {
             {" "}            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-[#1B212C]/95 backdrop-blur-sm border-t border-[#A0AEC0]/10">
               {/* PDF Tools Section */}
               <div className="border-b border-[#A0AEC0]/10 pb-2 mb-2">
-                <p className="text-[#A0AEC0] text-sm font-medium px-3 py-1 uppercase tracking-wide">PDF Tools</p>
-                <button
+                <p className="text-[#A0AEC0] text-sm font-medium px-3 py-1 uppercase tracking-wide">PDF Tools</p>                <button
                   onClick={() => handleNavClick("merger")}
                   className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
                 >
                   PDF Merger
+                </button>
+                <button
+                  onClick={() => handleNavClick("split-pdf")}
+                  className="text-[#E1E6EB] hover:text-[#00A99D] block px-3 py-2 text-base font-medium transition-colors w-full text-left"
+                >
+                  Split PDF
                 </button>
                 <button
                   onClick={() => handleNavClick("builder")}

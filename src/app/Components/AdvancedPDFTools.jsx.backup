@@ -8,7 +8,7 @@ import {
   Minimize2,
   Lock,
   Droplets,
-  FileText, 
+  FileText,
   Download,
   Upload,
   Loader,
@@ -41,9 +41,7 @@ import {
   splitByFileSize,
   splitByBookmarks,
   splitByContentPattern,
-  splitByCustomPoints,
-  parsePageRanges,
-  parsePageNumbers
+  splitByCustomPoints
 } from '../utils/pdfSplitter';
 
 // Dynamically import OCRProcessor to avoid SSR issues
@@ -59,9 +57,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
-  const [showOCR, setShowOCR] = useState(false);
-
-  const [toolSettings, setToolSettings] = useState({
+  const [showOCR, setShowOCR] = useState(false);  const [toolSettings, setToolSettings] = useState({
     split: {
       mode: SPLIT_MODES.ALL_PAGES,
       pageRanges: '',
@@ -86,15 +82,13 @@ const AdvancedPDFTools = ({ onNavigate }) => {
     },
     extract: { pageNumbers: [] }
   });
-
   useEffect(() => {
     setMounted(true);
   }, []);
 
   // PDF Tools configuration
   const pdfTools = [
-    {
-      id: 'split',
+    {      id: 'split',
       name: 'Split PDF',
       description: 'Advanced PDF splitting with multiple options',
       icon: Scissors,
@@ -128,8 +122,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
       color: 'text-cyan-400',
       bgColor: 'bg-cyan-500/10',
       borderColor: 'border-cyan-500/20'
-    },
-    {
+    },    {
       id: 'extract',
       name: 'Extract Pages',
       description: 'Extract specific pages from PDF documents',
@@ -188,9 +181,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
       const processResults = [];
 
       for (const file of files) {
-        let result;
-        
-        switch (selectedTool) {
+        let result;        switch (selectedTool) {
           case 'split':
             // Use the enhanced split functionality based on selected mode
             const splitSettings = toolSettings.split;
@@ -203,24 +194,14 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                   }
                 });
                 break;
-                  case SPLIT_MODES.PAGE_RANGES:
+                
+              case SPLIT_MODES.PAGE_RANGES:
                 if (!splitSettings.pageRanges.trim()) {
                   result = { success: false, error: 'Please specify page ranges (e.g., 1-3,5-7)' };
                 } else {
-                  // Get PDF info to get total page count for validation
-                  const pdfInfo = await getPDFInfo(file);
-                  if (!pdfInfo.success) {
-                    result = { success: false, error: 'Failed to read PDF information' };
-                  } else {
-                    const ranges = parsePageRanges(splitSettings.pageRanges, pdfInfo.info.pageCount);
-                    if (ranges.length === 0) {
-                      result = { success: false, error: 'No valid page ranges found. Please check your input.' };
-                    } else {
-                      result = await splitByPageRanges(file, ranges, {
-                        preserveBookmarks: splitSettings.preserveBookmarks
-                      });
-                    }
-                  }
+                  result = await splitByPageRanges(file, splitSettings.pageRanges, {
+                    preserveBookmarks: splitSettings.preserveBookmarks
+                  });
                 }
                 break;
                 
@@ -228,20 +209,9 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                 if (!splitSettings.specificPages.trim()) {
                   result = { success: false, error: 'Please specify page numbers (e.g., 1,3,5)' };
                 } else {
-                  // Get PDF info to get total page count for validation
-                  const pdfInfo = await getPDFInfo(file);
-                  if (!pdfInfo.success) {
-                    result = { success: false, error: 'Failed to read PDF information' };
-                  } else {
-                    const ranges = parsePageRanges(splitSettings.specificPages, pdfInfo.info.pageCount);
-                    if (ranges.length === 0) {
-                      result = { success: false, error: 'No valid page numbers found. Please check your input.' };
-                    } else {
-                      result = await splitByPageRanges(file, ranges, {
-                        preserveBookmarks: splitSettings.preserveBookmarks
-                      });
-                    }
-                  }
+                  result = await splitByPageRanges(file, splitSettings.specificPages, {
+                    preserveBookmarks: splitSettings.preserveBookmarks
+                  });
                 }
                 break;
                 
@@ -287,7 +257,6 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                 result = await splitIntoIndividualPages(file);
             }
             break;
-            
           case 'rotate':
             const rotations = {};
             // Apply rotation to all pages
@@ -299,15 +268,12 @@ const AdvancedPDFTools = ({ onNavigate }) => {
             }
             result = await rotatePDF(file, rotations);
             break;
-            
           case 'compress':
             result = await compressPDF(file, toolSettings.compress.level);
             break;
-            
           case 'watermark':
             result = await addWatermark(file, toolSettings.watermark);
             break;
-            
           case 'extract':
             if (toolSettings.extract.pageNumbers.length === 0) {
               result = { success: false, error: 'No pages specified for extraction' };
@@ -315,7 +281,6 @@ const AdvancedPDFTools = ({ onNavigate }) => {
               result = await extractPages(file, toolSettings.extract.pageNumbers);
             }
             break;
-            
           default:
             result = { success: false, error: 'Unknown tool selected' };
         }
@@ -334,7 +299,6 @@ const AdvancedPDFTools = ({ onNavigate }) => {
       setIsProcessing(false);
     }
   };
-
   // Download processed file
   const downloadResult = (result) => {
     if (result.blob) {
@@ -344,7 +308,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
       result.splitFiles.forEach((file, index) => {
         setTimeout(() => {
           downloadBlob(file.blob, file.fileName);
-        }, index * 500);
+        }, index * 500); // Delay to avoid browser blocking multiple downloads
       });
     } else if (result.pages) {
       // Legacy fallback for old split format
@@ -356,18 +320,12 @@ const AdvancedPDFTools = ({ onNavigate }) => {
     }
   };
 
-  // Download split file to handle all formats
+  // Download individual split file
   const downloadSplitFile = (file) => {
-    try {
-      downloadBlob(file.blob, file.fileName);
-    } catch (error) {
-      console.error('Download failed:', error);
-      setError(`Failed to download ${file.fileName}: ${error.message}`);
-    }
+    downloadBlob(file.blob, file.fileName);
   };
 
-  // Tool-specific settings components
-  const renderToolSettings = () => {
+  // Tool-specific settings components  const renderToolSettings = () => {
     switch (selectedTool) {
       case 'split':
         return (
@@ -744,15 +702,12 @@ const AdvancedPDFTools = ({ onNavigate }) => {
               Selected pages: {toolSettings.extract.pageNumbers.join(', ') || 'None'}
             </p>
           </div>
-        );
-
-      default:
+        );      default:
         return null;
     }
   };
 
   const selectedToolInfo = pdfTools.find(tool => tool.id === selectedTool);
-
   return (
     <>
       {showOCR ? (
@@ -765,329 +720,313 @@ const AdvancedPDFTools = ({ onNavigate }) => {
         }} />
       ) : (
         <div className="min-h-screen bg-[#1B212C] py-8">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Header */}
-            <motion.div
-              className="text-center mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] mb-4">
-                Advanced PDF <span className="text-[#00A99D]">Tools</span>
-              </h1>
-              <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto">
-                Professional PDF manipulation tools for all your document processing needs
-              </p>
-            </motion.div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] mb-4">
+            Advanced PDF <span className="text-[#00A99D]">Tools</span>
+          </h1>
+          <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto">
+            Professional PDF manipulation tools for all your document processing needs
+          </p>
+        </motion.div>
 
-            {/* Tool Selection */}
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              {pdfTools.map((tool) => {
-                const Icon = tool.icon;
-                const isSelected = selectedTool === tool.id;
-                
-                return (
-                  <motion.div
-                    key={tool.id}
-                    className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${
-                      isSelected
-                        ? `${tool.bgColor} ${tool.borderColor} border-2`
-                        : 'bg-[#151B24] border-[#A0AEC0]/20 hover:border-[#00A99D]/50'
-                    }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      if (tool.id === 'ocr') {
-                        setShowOCR(true);
-                      } else {
-                        setSelectedTool(tool.id);
-                      }
-                    }}
-                  >
-                    <div className="flex items-center gap-4 mb-3">
-                      <div className={`p-3 rounded-xl ${tool.bgColor} ${tool.borderColor} border`}>
-                        <Icon className={`w-6 h-6 ${tool.color}`} />
-                      </div>
-                      <h3 className="text-lg font-semibold text-[#E1E6EB]">{tool.name}</h3>
-                    </div>
-                    <p className="text-[#A0AEC0] text-sm">{tool.description}</p>
-                    {isSelected && (
-                      <motion.div
-                        className="mt-3 flex items-center gap-2 text-[#00A99D] text-sm"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Selected</span>
-                      </motion.div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-
-            {/* File Upload Section */}
-            {selectedTool && (
+        {/* Tool Selection */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          {pdfTools.map((tool) => {
+            const Icon = tool.icon;
+            const isSelected = selectedTool === tool.id;
+            
+            return (
               <motion.div
-                className="bg-[#151B24] rounded-2xl border border-[#A0AEC0]/20 p-6 mb-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+                key={tool.id}
+                className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${
+                  isSelected
+                    ? `${tool.bgColor} ${tool.borderColor} border-2`
+                    : 'bg-[#151B24] border-[#A0AEC0]/20 hover:border-[#00A99D]/50'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  if (tool.id === 'ocr') {
+                    setShowOCR(true);
+                  } else {
+                    setSelectedTool(tool.id);
+                  }
+                }}
               >
-                <h3 className="text-xl font-semibold text-[#E1E6EB] mb-4">
-                  Upload PDF Files for {selectedToolInfo?.name}
-                </h3>
-                
-                <div
-                  {...getRootProps()}
-                  className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer ${
-                    isDragActive
-                      ? 'border-[#00A99D] bg-[#00A99D]/5'
-                      : 'border-[#A0AEC0]/30 hover:border-[#00A99D]/50'
-                  }`}
-                >
-                  <input {...getInputProps()} />
-                  <Upload className="w-12 h-12 text-[#00A99D] mx-auto mb-3" />
-                  <h4 className="text-lg font-semibold text-[#E1E6EB] mb-2">
-                    {isDragActive ? 'Drop PDF files here' : 'Upload PDF Files'}
-                  </h4>
-                  <p className="text-[#A0AEC0]">
-                    Drag & drop PDF files or click to browse
-                  </p>
-                </div>
-
-                {/* Uploaded Files */}
-                {files.length > 0 && (
-                  <div className="mt-6">
-                    <h4 className="text-lg font-semibold text-[#E1E6EB] mb-3">
-                      Uploaded Files ({files.length})
-                    </h4>
-                    <div className="space-y-2">
-                      {files.map((file, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-3 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg"
-                        >
-                          <div className="flex items-center gap-3">
-                            <FileText className="w-5 h-5 text-[#00A99D]" />
-                            <div>
-                              <p className="text-[#E1E6EB] font-medium">{file.name}</p>
-                              <p className="text-[#A0AEC0] text-sm">{formatFileSize(file.size)}</p>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => setFiles(prev => prev.filter((_, i) => i !== index))}
-                            className="text-red-400 hover:text-red-300 transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                <div className="flex items-center gap-4 mb-3">
+                  <div className={`p-3 rounded-xl ${tool.bgColor} ${tool.borderColor} border`}>
+                    <Icon className={`w-6 h-6 ${tool.color}`} />
                   </div>
+                  <h3 className="text-lg font-semibold text-[#E1E6EB]">{tool.name}</h3>
+                </div>
+                <p className="text-[#A0AEC0] text-sm">{tool.description}</p>
+                {isSelected && (
+                  <motion.div
+                    className="mt-3 flex items-center gap-2 text-[#00A99D] text-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Selected</span>
+                  </motion.div>
                 )}
               </motion.div>
-            )}
+            );
+          })}
+        </motion.div>
 
-            {/* Tool Settings */}
-            {selectedTool && (
-              <motion.div
-                className="bg-[#151B24] rounded-2xl border border-[#A0AEC0]/20 p-6 mb-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <Settings className="w-6 h-6 text-[#00A99D]" />
-                  <h3 className="text-xl font-semibold text-[#E1E6EB]">
-                    {selectedToolInfo?.name} Settings
-                  </h3>
-                </div>
-                
-                {renderToolSettings()}
+        {/* File Upload Section */}
+        {selectedTool && (
+          <motion.div
+            className="bg-[#151B24] rounded-2xl border border-[#A0AEC0]/20 p-6 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <h3 className="text-xl font-semibold text-[#E1E6EB] mb-4">
+              Upload PDF Files for {selectedToolInfo?.name}
+            </h3>
+            
+            <div
+              {...getRootProps()}
+              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer ${
+                isDragActive
+                  ? 'border-[#00A99D] bg-[#00A99D]/5'
+                  : 'border-[#A0AEC0]/30 hover:border-[#00A99D]/50'
+              }`}
+            >
+              <input {...getInputProps()} />
+              <Upload className="w-12 h-12 text-[#00A99D] mx-auto mb-3" />
+              <h4 className="text-lg font-semibold text-[#E1E6EB] mb-2">
+                {isDragActive ? 'Drop PDF files here' : 'Upload PDF Files'}
+              </h4>
+              <p className="text-[#A0AEC0]">
+                Drag & drop PDF files or click to browse
+              </p>
+            </div>
 
-                {/* Process Button */}
-                <div className="mt-6 pt-6 border-t border-[#A0AEC0]/20">
-                  <button
-                    onClick={processFiles}
-                    disabled={files.length === 0 || isProcessing}
-                    className={`w-full px-6 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
-                      files.length > 0 && !isProcessing
-                        ? 'bg-[#00A99D] hover:bg-[#00A99D]/90 text-white'
-                        : 'bg-[#A0AEC0]/20 text-[#A0AEC0] cursor-not-allowed'
-                    }`}
-                  >
-                    {isProcessing ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <Loader className="w-5 h-5 animate-spin" />
-                        <span>Processing...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2">
-                        <Zap className="w-5 h-5" />
-                        <span>Process Files ({files.length})</span>
-                      </div>
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Error Display */}
-            <AnimatePresence>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-8"
-                >
-                  <div className="flex items-center gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-400" />
-                    <span className="text-red-400">{error}</span>
-                    <button
-                      onClick={() => setError(null)}
-                      className="ml-auto text-red-400 hover:text-red-300"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Results */}
-            {results.length > 0 && (
-              <motion.div
-                className="bg-[#151B24] rounded-2xl border border-[#A0AEC0]/20 p-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <h3 className="text-xl font-semibold text-[#E1E6EB] mb-6">
-                  Processing Results
-                </h3>
-                
-                <div className="space-y-4">
-                  {results.map((result, index) => (
+            {/* Uploaded Files */}
+            {files.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-lg font-semibold text-[#E1E6EB] mb-3">
+                  Uploaded Files ({files.length})
+                </h4>
+                <div className="space-y-2">
+                  {files.map((file, index) => (
                     <div
                       key={index}
-                      className={`p-4 rounded-xl border ${
-                        result.success
-                          ? 'bg-green-500/10 border-green-500/20'
-                          : 'bg-red-500/10 border-red-500/20'
-                      }`}
+                      className="flex items-center justify-between p-3 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg"
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          {result.success ? (
-                            <CheckCircle className="w-5 h-5 text-green-400" />
-                          ) : (
-                            <AlertCircle className="w-5 h-5 text-red-400" />
-                          )}
-                          <div>
-                            <p className="text-[#E1E6EB] font-medium">{result.fileName}</p>
-                            {result.success ? (
-                              <div className="text-[#A0AEC0] text-sm">
-                                {result.compressionRatio && (
-                                  <span>Compressed: {result.compressionRatio}% reduction • </span>
-                                )}
-                                {result.extractedPages && (
-                                  <span>Extracted pages: {result.extractedPages.join(', ')} • </span>
-                                )}
-                                {result.splitFiles && (
-                                  <span>Split into {result.splitFiles.length} files • </span>
-                                )}
-                                {result.pages && (
-                                  <span>Split into {result.pages.length} pages • </span>
-                                )}
-                                {result.splitMode && (
-                                  <span>Mode: {result.splitMode.replace('_', ' ')} • </span>
-                                )}
-                                Original size: {formatFileSize(result.originalSize)}
-                              </div>
-                            ) : (
-                              <p className="text-red-400 text-sm">{result.error}</p>
-                            )}
-                          </div>
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-5 h-5 text-[#00A99D]" />
+                        <div>
+                          <p className="text-[#E1E6EB] font-medium">{file.name}</p>
+                          <p className="text-[#A0AEC0] text-sm">{formatFileSize(file.size)}</p>
                         </div>
-                        
-                        {result.success && (
-                          <button
-                            onClick={() => downloadResult(result)}
-                            className="px-4 py-2 bg-[#00A99D] hover:bg-[#00A99D]/90 text-white rounded-lg transition-colors flex items-center gap-2"
-                          >
-                            <Download className="w-4 h-4" />
-                            <span>Download All</span>
-                          </button>
-                        )}
                       </div>
-
-                      {/* Show individual split files for split operations */}
-                      {result.success && result.splitFiles && result.splitFiles.length > 0 && (
-                        <div className="mt-3 border-t border-[#A0AEC0]/20 pt-3">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-[#E1E6EB] text-sm font-medium">
-                              Split Files ({result.splitFiles.length})
-                            </h4>
-                            <button
-                              onClick={() => downloadAllSplitFiles(result.splitFiles)}
-                              className="px-2 py-1 bg-[#00A99D]/20 hover:bg-[#00A99D]/30 text-[#00A99D] rounded text-xs transition-colors"
-                            >
-                              Download All
-                            </button>
-                          </div>
-                          <div className="grid gap-2 max-h-40 overflow-y-auto">
-                            {result.splitFiles.map((file, fileIndex) => (
-                              <div
-                                key={fileIndex}
-                                className="flex items-center justify-between p-2 bg-[#1B212C] rounded-lg hover:bg-[#1B212C]/80 transition-colors"
-                              >
-                                <div className="flex items-center gap-2 flex-1 min-w-0">
-                                  <FileText className="w-4 h-4 text-[#00A99D] flex-shrink-0" />
-                                  <div className="min-w-0 flex-1">
-                                    <p className="text-[#E1E6EB] text-sm truncate" title={file.fileName}>
-                                      {file.fileName}
-                                    </p>
-                                    <div className="flex items-center gap-2 text-[#A0AEC0] text-xs">
-                                      {file.range && <span>Pages: {file.range}</span>}
-                                      <span>•</span>
-                                      <span>{formatFileSize(file.size)}</span>
-                                      {file.pageCount && (
-                                        <>
-                                          <span>•</span>
-                                          <span>{file.pageCount} page{file.pageCount !== 1 ? 's' : ''}</span>
-                                        </>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => downloadSplitFile(file)}
-                                  className="px-2 py-1 bg-[#00A99D]/20 hover:bg-[#00A99D]/30 text-[#00A99D] rounded text-xs transition-colors flex items-center gap-1 flex-shrink-0 ml-2"
-                                  title={`Download ${file.fileName}`}
-                                >
-                                  <Download className="w-3 h-3" />
-                                  <span className="hidden sm:inline">Download</span>
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <button
+                        onClick={() => setFiles(prev => prev.filter((_, i) => i !== index))}
+                        className="text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             )}
-          </div>
-        </div>
+          </motion.div>
+        )}
+
+        {/* Tool Settings */}
+        {selectedTool && (
+          <motion.div
+            className="bg-[#151B24] rounded-2xl border border-[#A0AEC0]/20 p-6 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <Settings className="w-6 h-6 text-[#00A99D]" />
+              <h3 className="text-xl font-semibold text-[#E1E6EB]">
+                {selectedToolInfo?.name} Settings
+              </h3>
+            </div>
+            
+            {renderToolSettings()}
+
+            {/* Process Button */}
+            <div className="mt-6 pt-6 border-t border-[#A0AEC0]/20">
+              <button
+                onClick={processFiles}
+                disabled={files.length === 0 || isProcessing}
+                className={`w-full px-6 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
+                  files.length > 0 && !isProcessing
+                    ? 'bg-[#00A99D] hover:bg-[#00A99D]/90 text-white'
+                    : 'bg-[#A0AEC0]/20 text-[#A0AEC0] cursor-not-allowed'
+                }`}
+              >
+                {isProcessing ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader className="w-5 h-5 animate-spin" />
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <Zap className="w-5 h-5" />
+                    <span>Process Files ({files.length})</span>
+                  </div>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Error Display */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-8"
+            >
+              <div className="flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400" />
+                <span className="text-red-400">{error}</span>
+                <button
+                  onClick={() => setError(null)}
+                  className="ml-auto text-red-400 hover:text-red-300"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Results */}
+        {results.length > 0 && (
+          <motion.div
+            className="bg-[#151B24] rounded-2xl border border-[#A0AEC0]/20 p-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h3 className="text-xl font-semibold text-[#E1E6EB] mb-6">
+              Processing Results
+            </h3>
+              <div className="space-y-4">
+              {results.map((result, index) => (
+                <div
+                  key={index}
+                  className={`p-4 rounded-xl border ${
+                    result.success
+                      ? 'bg-green-500/10 border-green-500/20'
+                      : 'bg-red-500/10 border-red-500/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      {result.success ? (
+                        <CheckCircle className="w-5 h-5 text-green-400" />
+                      ) : (
+                        <AlertCircle className="w-5 h-5 text-red-400" />
+                      )}
+                      <div>
+                        <p className="text-[#E1E6EB] font-medium">{result.fileName}</p>
+                        {result.success ? (
+                          <div className="text-[#A0AEC0] text-sm">
+                            {result.compressionRatio && (
+                              <span>Compressed: {result.compressionRatio}% reduction • </span>
+                            )}
+                            {result.extractedPages && (
+                              <span>Extracted pages: {result.extractedPages.join(', ')} • </span>
+                            )}
+                            {result.splitFiles && (
+                              <span>Split into {result.splitFiles.length} files • </span>
+                            )}
+                            {result.pages && (
+                              <span>Split into {result.pages.length} pages • </span>
+                            )}
+                            {result.splitMode && (
+                              <span>Mode: {result.splitMode.replace('_', ' ')} • </span>
+                            )}
+                            Original size: {formatFileSize(result.originalSize)}
+                          </div>
+                        ) : (
+                          <p className="text-red-400 text-sm">{result.error}</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {result.success && (
+                      <button
+                        onClick={() => downloadResult(result)}
+                        className="px-4 py-2 bg-[#00A99D] hover:bg-[#00A99D]/90 text-white rounded-lg transition-colors flex items-center gap-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Download All</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Show individual split files for split operations */}
+                  {result.success && result.splitFiles && result.splitFiles.length > 0 && (
+                    <div className="mt-3 border-t border-[#A0AEC0]/20 pt-3">
+                      <h4 className="text-[#E1E6EB] text-sm font-medium mb-2">
+                        Split Files ({result.splitFiles.length})
+                      </h4>
+                      <div className="grid gap-2 max-h-32 overflow-y-auto">
+                        {result.splitFiles.slice(0, 5).map((file, fileIndex) => (
+                          <div
+                            key={fileIndex}
+                            className="flex items-center justify-between p-2 bg-[#1B212C] rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-[#00A99D]" />
+                              <div>
+                                <p className="text-[#E1E6EB] text-sm">{file.fileName}</p>
+                                <p className="text-[#A0AEC0] text-xs">
+                                  {file.range && `Pages: ${file.range} • `}
+                                  {formatFileSize(file.size)}
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => downloadSplitFile(file)}
+                              className="px-2 py-1 bg-[#00A99D]/20 hover:bg-[#00A99D]/30 text-[#00A99D] rounded text-xs transition-colors"
+                            >
+                              Download
+                            </button>
+                          </div>
+                        ))}
+                        {result.splitFiles.length > 5 && (
+                          <p className="text-[#A0AEC0] text-xs text-center py-1">
+                            ... and {result.splitFiles.length - 5} more files
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.div>        )}
+      </div>
+    </div>
       )}
     </>
   );

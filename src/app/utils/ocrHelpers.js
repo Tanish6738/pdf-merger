@@ -1,6 +1,52 @@
 // OCR (Optical Character Recognition) utilities for PDF processing
 import { createWorker } from 'tesseract.js';
 
+// File type detection utility
+export const detectFileType = (file) => {
+  const fileName = file.name.toLowerCase();
+  const fileType = file.type.toLowerCase();
+  
+  // Check MIME type first
+  if (fileType === 'application/pdf') {
+    return {
+      type: 'pdf',
+      suggestion: 'This PDF will be processed page by page with OCR to extract text.',
+      supportedFeatures: ['text extraction', 'page-by-page processing', 'searchable content']
+    };
+  }
+  
+  if (fileType.startsWith('image/')) {
+    return {
+      type: 'image',
+      suggestion: 'This image will be processed with OCR to extract any text content.',
+      supportedFeatures: ['text extraction', 'image preprocessing', 'layout detection']
+    };
+  }
+  
+  // Fallback to file extension if MIME type is unclear
+  if (fileName.endsWith('.pdf')) {
+    return {
+      type: 'pdf',
+      suggestion: 'This file appears to be a PDF and will be processed page by page with OCR.',
+      supportedFeatures: ['text extraction', 'page-by-page processing', 'searchable content']
+    };
+  }
+  
+  if (fileName.match(/\.(jpg|jpeg|png|gif|bmp|tiff|webp)$/)) {
+    return {
+      type: 'image',
+      suggestion: 'This image file will be processed with OCR to extract any text content.',
+      supportedFeatures: ['text extraction', 'image preprocessing', 'layout detection']
+    };
+  }
+  
+  return {
+    type: 'unsupported',
+    suggestion: 'This file type is not supported. Please upload PDF or image files (JPG, PNG, GIF, BMP, TIFF, WebP).',
+    supportedFeatures: []
+  };
+};
+
 class OCRProcessor {
   constructor() {
     this.worker = null;
@@ -27,20 +73,27 @@ class OCRProcessor {
       this.isInitialized = false;
     }
   }
-
   async extractTextFromImage(imageData, options = {}) {
     if (!this.isInitialized) {
       await this.initializeOCR();
     }
 
     try {
-      const { data: { text, confidence } } = await this.worker.recognize(imageData, {
-        logger: options.logger || ((info) => {
-          if (options.onProgress) {
-            options.onProgress(info);
-          }
-        })
-      });
+      // Create a serializable logger function to avoid DataCloneError
+      const loggerConfig = options.onProgress ? {
+        logger: function(info) {
+          // This function will be cloned, so we can't use closures
+          // We'll handle progress updates outside the worker
+          console.log('OCR Progress:', info.status, info.progress);
+        }
+      } : {};
+
+      const { data: { text, confidence } } = await this.worker.recognize(imageData, loggerConfig);
+
+      // Call progress callback after completion if provided
+      if (options.onProgress) {
+        options.onProgress({ status: 'recognizing text', progress: 1 });
+      }
 
       return {
         text: text.trim(),
@@ -160,16 +213,25 @@ class OCRProcessor {
       img.src = imageData;
     });
   }
-
   async extractTextWithLayout(imageData, options = {}) {
     if (!this.isInitialized) {
       await this.initializeOCR();
     }
 
     try {
-      const { data } = await this.worker.recognize(imageData, {
-        logger: options.logger
-      });
+      // Create a serializable logger function to avoid DataCloneError
+      const loggerConfig = options.onProgress ? {
+        logger: function(info) {
+          console.log('OCR Layout Progress:', info.status, info.progress);
+        }
+      } : {};
+
+      const { data } = await this.worker.recognize(imageData, loggerConfig);
+
+      // Call progress callback after completion if provided
+      if (options.onProgress) {
+        options.onProgress({ status: 'recognizing text with layout', progress: 1 });
+      }
 
       // Extract layout information
       const layoutData = {
@@ -248,7 +310,7 @@ class OCRProcessor {
     const { text } = ocrResult;
     
     const patterns = {
-      emails: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+      emails: /\b[A-Za-z0-9._%+-]+@[A-ZaZ0-9.-]+\.[A-Z|a-z]{2,}\b/g,
       phones: /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g,
       dates: /\b\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}\b/g,
       numbers: /\b\d+\.?\d*\b/g,

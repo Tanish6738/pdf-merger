@@ -14,6 +14,11 @@ const EnhancedPDFBuilder = dynamic(() => import('./Components/EnhancedPDFBuilder
   loading: () => <div className="min-h-screen bg-[#1B212C] flex items-center justify-center"><div className="text-[#E1E6EB]">Loading PDF Builder...</div></div>
 })
 
+const SimplePDFBuilder = dynamic(() => import('./Components/SimplePDFBuilder'), { 
+  ssr: false,
+  loading: () => <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-gray-600">Loading Simple PDF Builder...</div></div>
+})
+
 const AdvancedPDFTools = dynamic(() => import('./Components/AdvancedPDFTools'), { 
   ssr: false,
   loading: () => <div className="min-h-screen bg-[#1B212C] flex items-center justify-center"><div className="text-[#E1E6EB]">Loading PDF Tools...</div></div>
@@ -49,6 +54,11 @@ const OCRProcessor = dynamic(() => import('./Components/OCRProcessor'), {
   loading: () => <div className="min-h-screen bg-[#1B212C] flex items-center justify-center"><div className="text-[#E1E6EB]">Loading OCR Processor...</div></div>
 })
 
+const SplitPDF = dynamic(() => import('./Components/SplitPDF'), { 
+  ssr: false,
+  loading: () => <div className="min-h-screen bg-[#1B212C] flex items-center justify-center"><div className="text-[#E1E6EB]">Loading Split PDF...</div></div>
+})
+
 const page = () => {
   const [currentView, setCurrentView] = useState('landing') // Enhanced navigation states
 
@@ -60,6 +70,8 @@ const page = () => {
         return <PDFMerger onNavigate={setCurrentView} />
       case 'builder':
         return <EnhancedPDFBuilder onNavigate={setCurrentView} />
+      case 'simple-builder':
+        return <SimplePDFBuilder onNavigate={setCurrentView} />
       case 'advanced-tools':
         return <AdvancedPDFTools onNavigate={setCurrentView} />
       case 'cloud':
@@ -74,6 +86,8 @@ const page = () => {
         return <ThemeAccessibilitySettings onNavigate={setCurrentView} />
       case 'ocr':
         return <OCRProcessor onNavigate={setCurrentView} />
+      case 'split-pdf':
+        return <SplitPDF onNavigate={setCurrentView} />
       default:
         return <Landing onNavigate={setCurrentView} />
     }

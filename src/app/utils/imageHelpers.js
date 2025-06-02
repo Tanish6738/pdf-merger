@@ -152,11 +152,13 @@ export const calculateImageFit = (imageSize, containerSize, fitMode = 'contain')
   switch (fitMode) {
     case 'contain': {
       const ratio = Math.min(containerW / imgW, containerH / imgH);
+      const newWidth = imgW * ratio;
+      const newHeight = imgH * ratio;
       return {
-        width: imgW * ratio,
-        height: imgH * ratio,
-        x: (containerW - imgW * ratio) / 2,
-        y: (containerH - imgH * ratio) / 2
+        width: newWidth,
+        height: newHeight,
+        x: (containerW - newWidth) / 2,
+        y: (containerH - newHeight) / 2
       };
     }
     
@@ -173,6 +175,7 @@ export const calculateImageFit = (imageSize, containerSize, fitMode = 'contain')
     }
     
     case 'fill':
+    case 'stretch':
       return {
         width: containerW,
         height: containerH,
@@ -180,12 +183,12 @@ export const calculateImageFit = (imageSize, containerSize, fitMode = 'contain')
         y: 0
       };
     
-    case 'stretch':
+    case 'original':
       return {
-        width: containerW,
-        height: containerH,
-        x: 0,
-        y: 0
+        width: Math.min(imgW, containerW),
+        height: Math.min(imgH, containerH),
+        x: (containerW - Math.min(imgW, containerW)) / 2,
+        y: (containerH - Math.min(imgH, containerH)) / 2
       };
     
     default:
@@ -196,6 +199,25 @@ export const calculateImageFit = (imageSize, containerSize, fitMode = 'contain')
         y: (containerH - imgH) / 2
       };
   }
+};
+
+// Apply fit mode to existing image
+export const applyFitMode = (imageData, imageInfo, containerSize, fitMode) => {
+  const originalSize = {
+    width: imageInfo.dimensions?.width || imageInfo.width || 200,
+    height: imageInfo.dimensions?.height || imageInfo.height || 200
+  };
+  
+  const fittedPosition = calculateImageFit(originalSize, containerSize, fitMode);
+  
+  return {
+    ...imageData,
+    fitMode,
+    width: fittedPosition.width,
+    height: fittedPosition.height,
+    x: fittedPosition.x,
+    y: fittedPosition.y
+  };
 };
 
 // Validate image bounds within container

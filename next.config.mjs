@@ -41,7 +41,7 @@ const nextConfig = {
           cacheGroups: {
             ...config.optimization.splitChunks?.cacheGroups,
             pdf: {
-              test: /[\\/]node_modules[\\/](pdf-lib|pdfjs-dist|buffer)[\\/]/,
+              test: /[\\/]node_modules[\\/](pdf-lib|pdfjs-dist|buffer|tesseract\.js)[\\/]/,
               name: 'pdf-libraries',
               chunks: 'all',
               priority: 10,
@@ -51,7 +51,37 @@ const nextConfig = {
       };
     }
     
+    // Handle .mjs files properly
+    config.module.rules.push({
+      test: /\.mjs$/,
+      type: 'javascript/auto',
+    });
+    
     return config;
+  },
+  
+  // Ensure static files are served properly
+  async headers() {
+    return [
+      {
+        source: '/pdf.worker.min.mjs',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript',
+          },
+        ],
+      },
+      {
+        source: '/pdf.worker.min.js',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript',
+          },
+        ],
+      },
+    ];
   },
 };
 
