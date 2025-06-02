@@ -898,7 +898,7 @@ export const splitByFileSize = splitBySize;
 export const splitByContentPattern = splitByContent;
 export const splitByCustomPoints = splitAtCustomPoints;
 
-export default {
+const pdfSplitterUtils = {
   SPLIT_MODES,
   splitIntoIndividualPages,
   splitByPageRanges,
@@ -924,3 +924,5 @@ export default {
   splitByContentPattern,
   splitByCustomPoints
 };
+
+export default pdfSplitterUtils;

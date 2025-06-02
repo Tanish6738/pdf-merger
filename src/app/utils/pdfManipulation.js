@@ -422,7 +422,7 @@ export const batchProcessPDFs = async (files, operation, options = {}) => {
   return results;
 };
 
-export default {
+const pdfManipulationUtils = {
   splitPDF,
   rotatePDF,
   compressPDF,
@@ -435,3 +435,5 @@ export default {
   ROTATION_ANGLES,
   COMPRESSION_LEVELS
 };
+
+export default pdfManipulationUtils;

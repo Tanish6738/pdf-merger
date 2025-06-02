@@ -431,7 +431,7 @@ export const usePerformanceOptimization = () => {
 };
 
 // Export utilities
-export default {
+const performanceOptimizationUtils = {
   PerformanceMonitor,
   MemoryManager,
   PDFProcessor,
@@ -440,3 +440,5 @@ export default {
   pdfProcessor,
   usePerformanceOptimization
 };
+
+export default performanceOptimizationUtils;

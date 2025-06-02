@@ -85,9 +85,11 @@ export const canvasToDataURL = (canvas, quality = 0.8) => {
   return canvas.toDataURL('image/jpeg', quality);
 };
 
-export default {
+const pdfjsUtils = {
   initializePDFJS,
   getPDFDocument,
   renderPageToCanvas,
   canvasToDataURL,
 };
+
+export default pdfjsUtils;

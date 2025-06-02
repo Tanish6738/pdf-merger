@@ -59,7 +59,7 @@ const SplitPDF = dynamic(() => import('./Components/SplitPDF'), {
   loading: () => <div className="min-h-screen bg-[#1B212C] flex items-center justify-center"><div className="text-[#E1E6EB]">Loading Split PDF...</div></div>
 })
 
-const page = () => {
+const Page = () => {
   const [currentView, setCurrentView] = useState('landing') // Enhanced navigation states
 
   const renderCurrentView = () => {
@@ -100,4 +100,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
