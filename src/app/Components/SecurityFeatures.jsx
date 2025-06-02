@@ -33,7 +33,7 @@ import {
 } from '../utils/securityHelpers';
 import { useToast } from './ToastProvider';
 
-const SecurityFeatures = () => {
+const SecurityFeatures = ({ onNavigate }) => {
   const { success, error: showError, warning, info } = useToast();
   
   const [files, setFiles] = useState([]);
@@ -42,15 +42,16 @@ const SecurityFeatures = () => {
   const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [passwords, setPasswords] = useState({});
-  const [permissions, setPermissions] = useState({
+  const [passwords, setPasswords] = useState({});  const [permissions, setPermissions] = useState({
     allowPrinting: false,
     allowModifying: false,
     allowCopying: false,
     allowAnnotating: false,
     allowFormFilling: true,
     allowAccessibility: true
-  });  const [watermarkSettings, setWatermarkSettings] = useState({
+  });
+  
+  const [watermarkSettings, setWatermarkSettings] = useState({
     text: 'CONFIDENTIAL',
     opacity: 0.3,
     fontSize: 48,
@@ -59,6 +60,13 @@ const SecurityFeatures = () => {
     position: 'center'
   });
   const [auditLog, setAuditLog] = useState([]);
+
+  // Handle back navigation
+  const handleBackClick = () => {
+    if (onNavigate) {
+      onNavigate('landing');
+    }
+  };
 
   // Security features configuration
   const securityFeatures = [
@@ -614,20 +622,46 @@ const SecurityFeatures = () => {
 
   return (
     <div className="min-h-screen bg-[#1B212C] py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">        {/* Header */}
         <motion.div
-          className="text-center mb-8"
+          className="mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] mb-4">
-            PDF <span className="text-[#00A99D]">Security</span>
-          </h1>
-          <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto">
-            Protect your sensitive documents with enterprise-grade security features
-          </p>
+          <div className="flex items-center justify-between mb-6">
+            {onNavigate && (
+              <button
+                onClick={handleBackClick}
+                className="flex items-center gap-2 px-4 py-2 bg-[#151B24] border border-[#A0AEC0]/20 rounded-lg text-[#A0AEC0] hover:text-[#00A99D] hover:border-[#00A99D]/50 transition-all duration-200"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+                Back to Home
+              </button>
+            )}
+            <div className="flex-1" />
+          </div>
+          
+          <div className="text-center">
+            <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] mb-4">
+              PDF <span className="text-[#00A99D]">Security</span>
+            </h1>
+            <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto">
+              Protect your sensitive documents with enterprise-grade security features
+            </p>
+          </div>
         </motion.div>
 
         {/* Security Features Grid */}

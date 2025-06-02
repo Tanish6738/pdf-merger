@@ -60,7 +60,7 @@ const CLOUD_PROVIDERS = {
   }
 };
 
-const CloudIntegration = () => {
+const CloudIntegration = ({ onNavigate }) => {
   const [connectedProviders, setConnectedProviders] = useState({});
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [cloudFiles, setCloudFiles] = useState([]);
@@ -70,6 +70,13 @@ const CloudIntegration = () => {
   const [uploadProgress, setUploadProgress] = useState({});
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [pendingUploads, setPendingUploads] = useState([]);
+
+  // Handle back navigation
+  const handleBackClick = () => {
+    if (onNavigate) {
+      onNavigate('landing');
+    }
+  };
 
   // Mock cloud files data
   const mockCloudFiles = {
@@ -288,18 +295,29 @@ const CloudIntegration = () => {
 
   return (
     <div className="min-h-screen bg-[#1B212C] py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">        {/* Header */}
         <motion.div
-          className="text-center mb-8"
+          className="mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] mb-4">
-            Cloud <span className="text-[#00A99D]">Integration</span>
-          </h1>
-          <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex-1">
+              <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] text-center">
+                Cloud <span className="text-[#00A99D]">Integration</span>
+              </h1>
+            </div>
+            {onNavigate && (
+              <button
+                onClick={handleBackClick}
+                className="px-4 py-2 bg-[#00A99D] text-white rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Back to Home
+              </button>
+            )}
+          </div>
+          <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto text-center">
             Connect your cloud storage accounts to access, merge, and manage your PDF files seamlessly
           </p>
         </motion.div>

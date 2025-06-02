@@ -753,6 +753,13 @@ const AdvancedPDFTools = ({ onNavigate }) => {
 
   const selectedToolInfo = pdfTools.find(tool => tool.id === selectedTool);
 
+  // Handle back navigation
+  const handleBackClick = () => {
+    if (onNavigate) {
+      onNavigate("landing");
+    }
+  };
+
   return (
     <>
       {showOCR ? (
@@ -763,20 +770,31 @@ const AdvancedPDFTools = ({ onNavigate }) => {
             onNavigate(view);
           }
         }} />
-      ) : (
-        <div className="min-h-screen bg-[#1B212C] py-8">
+      ) : (        <div className="min-h-screen bg-[#1B212C] py-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
             <motion.div
-              className="text-center mb-8"
+              className="mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] mb-4">
-                Advanced PDF <span className="text-[#00A99D]">Tools</span>
-              </h1>
-              <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex-1">
+                  <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] text-center">
+                    Advanced PDF <span className="text-[#00A99D]">Tools</span>
+                  </h1>
+                </div>
+                {onNavigate && (
+                  <button
+                    onClick={handleBackClick}
+                    className="px-4 py-2 bg-[#00A99D] text-white rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    Back to Home
+                  </button>
+                )}
+              </div>
+              <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto text-center">
                 Professional PDF manipulation tools for all your document processing needs
               </p>
             </motion.div>

@@ -54,7 +54,7 @@ import {
   saveMergeHistory
 } from '../utils/pdfHelpers';
 
-const PDFMerger = () => {
+const PDFMerger = ({ onNavigate }) => {
   const [files, setFiles] = useState([]);
   const [allPages, setAllPages] = useState([]);
   const [selectedPages, setSelectedPages] = useState(new Map());
@@ -443,6 +443,12 @@ const PDFMerger = () => {
       });
     }
   };
+  // Handle back navigation
+  const handleBackClick = () => {
+    if (onNavigate) {
+      onNavigate("landing");
+    }
+  };
 
   // Get valid files count
   const validFilesCount = files.filter(file => file.isValid).length;
@@ -450,24 +456,33 @@ const PDFMerger = () => {
 
   return (
     <div className="min-h-screen bg-[#1B212C] py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}        <motion.div
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">        {/* Header */}        <motion.div
           className="text-center mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB]">
-              PDF <span className="text-[#00A99D]">Merger</span>
-            </h1>
-            <button
-              onClick={() => setShowHistory(true)}
-              className="p-2 text-[#A0AEC0] hover:text-[#00A99D] transition-colors"
-              title="View merge history"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-center gap-4 flex-1">
+              <h1 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB]">
+                PDF <span className="text-[#00A99D]">Merger</span>
+              </h1>
+              <button
+                onClick={() => setShowHistory(true)}
+                className="p-2 text-[#A0AEC0] hover:text-[#00A99D] transition-colors"
+                title="View merge history"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </div>
+            {onNavigate && (
+              <button
+                onClick={handleBackClick}
+                className="px-4 py-2 bg-[#00A99D] text-white rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Back to Home
+              </button>
+            )}
           </div>          <p className="text-xl text-[#A0AEC0] max-w-2xl mx-auto">
             Upload multiple PDF files, preview and select specific pages, reorder them as needed, and merge into a single document
           </p>

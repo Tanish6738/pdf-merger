@@ -91,7 +91,16 @@ const OCRProcessor = ({ onNavigate }) => {
         </div>
       </div>
     );
-  }const processOCR = async () => {
+  }
+
+  // Handle back navigation
+  const handleBackClick = () => {
+    if (onNavigate) {
+      onNavigate('landing');
+    }
+  };
+
+  const processOCR = async () => {
     if (files.length === 0) return;    // Check for unsupported file types
     const unsupportedFiles = fileTypes.filter(ft => ft.type === 'unsupported');
     if (unsupportedFiles.length > 0) {
@@ -315,28 +324,28 @@ const OCRProcessor = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-[#1B212C] text-white">
       <ToastContainer />      {/* Header */}
-      <div className="bg-[#1B212C] border-b border-[#A0AEC0]/20 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-[#1B212C] border-b border-[#A0AEC0]/20 sticky top-0 z-40">        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             <div className="flex items-center space-x-3 sm:space-x-4">
-              <button
-                onClick={() => onNavigate('landing')}
-                className="text-[#00A99D] hover:text-[#00A99D]/80 transition-colors p-1"
-              >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-              </button>
               <h1 className="text-lg sm:text-xl font-bold text-white">OCR Text Extraction</h1>
             </div>
-            {/* Mobile progress indicator */}
-            {isProcessing && (
-              <div className="flex items-center space-x-2 text-sm">
-                <div className="w-4 h-4 border-2 border-[#00A99D] border-t-transparent rounded-full animate-spin"></div>
-                <span className="hidden sm:inline text-[#A0AEC0]">{progress}%</span>
-                <span className="sm:hidden text-[#A0AEC0]">{progress}%</span>
-              </div>
-            )}
+            <div className="flex items-center gap-4">
+              {/* Mobile progress indicator */}
+              {isProcessing && (
+                <div className="flex items-center space-x-2 text-sm">
+                  <div className="w-4 h-4 border-2 border-[#00A99D] border-t-transparent rounded-full animate-spin"></div>
+                  <span className="hidden sm:inline text-[#A0AEC0]">{progress}%</span>
+                  <span className="sm:hidden text-[#A0AEC0]">{progress}%</span>
+                </div>
+              )}
+              {/* Back to Home Button */}
+              <button
+                onClick={handleBackClick}
+                className="px-4 py-2 bg-[#00A99D] text-white rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Back to Home
+              </button>
+            </div>
           </div>
         </div>
       </div><div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">

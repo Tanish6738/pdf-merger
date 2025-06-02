@@ -16,7 +16,7 @@ import {
   Zap
 } from 'lucide-react';
 
-const Analytics = ({ isOpen, onClose }) => {
+const Analytics = ({ isOpen, onClose, onNavigate }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [timeRange, setTimeRange] = useState('week');
   const [analytics, setAnalytics] = useState(null);
