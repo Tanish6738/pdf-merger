@@ -24,8 +24,18 @@ import {
 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { formatFileSize, downloadBlob } from '../utils/pdfHelpers';
+import { 
+  generateSecurePassword, 
+  validatePasswordStrength, 
+  logSecurityEvent, 
+  copyToClipboard,
+  formatFileSize as securityFormatFileSize
+} from '../utils/securityHelpers';
+import { useToast } from './ToastProvider';
 
 const SecurityFeatures = () => {
+  const { success, error: showError, warning, info } = useToast();
+  
   const [files, setFiles] = useState([]);
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -40,6 +50,13 @@ const SecurityFeatures = () => {
     allowAnnotating: false,
     allowFormFilling: true,
     allowAccessibility: true
+  });  const [watermarkSettings, setWatermarkSettings] = useState({
+    text: 'CONFIDENTIAL',
+    opacity: 0.3,
+    fontSize: 48,
+    rotation: 45,
+    color: 'gray',
+    position: 'center'
   });
   const [auditLog, setAuditLog] = useState([]);
 
@@ -82,7 +99,6 @@ const SecurityFeatures = () => {
       borderColor: 'border-green-500/20'
     }
   ];
-
   // File upload handling
   const onDrop = useCallback((acceptedFiles) => {
     const newFiles = acceptedFiles.map(file => ({
@@ -99,11 +115,14 @@ const SecurityFeatures = () => {
     setFiles(prev => [...prev, ...newFiles]);
     setError(null);
     
+    // Show success notification
+    info(`${newFiles.length} file(s) uploaded successfully`);
+    
     // Add to audit log
     newFiles.forEach(file => {
       addToAuditLog('file_uploaded', `File "${file.name}" uploaded for security processing`);
     });
-  }, [permissions]);
+  }, [permissions, info]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -128,15 +147,17 @@ const SecurityFeatures = () => {
     
     setAuditLog(prev => [entry, ...prev].slice(0, 100)); // Keep last 100 entries
   };
-
   // Generate secure password
-  const generateSecurePassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
-    let password = '';
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
+  const handleGeneratePassword = () => {
+    const newPassword = generateSecurePassword({
+      length: 12,
+      includeUppercase: true,
+      includeLowercase: true,
+      includeNumbers: true,
+      includeSymbols: true,
+      excludeSimilar: true
+    });
+    return newPassword;
   };
 
   // Apply security features
@@ -150,81 +171,192 @@ const SecurityFeatures = () => {
       const file = files.find(f => f.id === fileId);
       if (!file) throw new Error('File not found');
 
-      // Simulate processing time
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      let result = {
-        success: true,
-        fileName: file.name,
-        originalSize: file.size,
-        action: selectedFeature
-      };
+      let result = null;
 
       switch (selectedFeature) {
         case 'encrypt':
-          const password = passwords[fileId] || generateSecurePassword();
-          result = {
-            ...result,
-            message: 'Password protection applied successfully',
-            password: password,
-            encrypted: true
-          };
-          
-          // Update file
-          setFiles(prev => prev.map(f => 
-            f.id === fileId 
-              ? { ...f, isProtected: true, password: password }
-              : f
-          ));
-          
-          addToAuditLog('file_encrypted', `File "${file.name}" encrypted with password protection`, fileId);
+          result = await handleEncryption(file);
           break;
-
         case 'permissions':
-          result = {
-            ...result,
-            message: 'Access permissions applied successfully',
-            permissions: permissions
-          };
-          
-          setFiles(prev => prev.map(f => 
-            f.id === fileId 
-              ? { ...f, permissions: { ...permissions } }
-              : f
-          ));
-          
-          addToAuditLog('permissions_applied', `Access permissions applied to "${file.name}"`, fileId);
+          result = await handlePermissions(file);
           break;
-
         case 'watermark':
-          result = {
-            ...result,
-            message: 'Security watermark added successfully',
-            watermark: true
-          };
-          
-          addToAuditLog('watermark_added', `Security watermark added to "${file.name}"`, fileId);
+          result = await handleWatermark(file);
           break;
-
         case 'audit':
-          result = {
-            ...result,
-            message: 'Audit tracking enabled successfully',
-            auditEnabled: true
-          };
-          
-          addToAuditLog('audit_enabled', `Audit tracking enabled for "${file.name}"`, fileId);
+          result = await handleAuditSetup(file);
           break;
-      }
-
-      setResults(prev => [...prev, result]);
+        default:
+          throw new Error('Invalid security feature selected');
+      }      setResults(prev => [...prev, result]);
       
-    } catch (error) {
+      // Show success notification
+      success(`${selectedFeature.charAt(0).toUpperCase() + selectedFeature.slice(1)} applied successfully to ${file.name}`);
+      
+      // Update file status
+      setFiles(prev => prev.map(f => 
+        f.id === fileId 
+          ? { 
+              ...f, 
+              isProtected: true, 
+              lastSecurityAction: selectedFeature,
+              lastProcessed: new Date().toISOString()
+            }
+          : f
+      ));
+
+      // Log security event
+      await logSecurityEvent(
+        `security_${selectedFeature}`,
+        `Applied ${selectedFeature} security feature to "${file.name}"`,
+        fileId,
+        file.name,
+        { feature: selectedFeature, fileSize: file.size }
+      );
+        } catch (error) {
       setError(error.message);
-      addToAuditLog('security_error', `Security operation failed: ${error.message}`, fileId);
+      showError(`Security operation failed: ${error.message}`);
+      await logSecurityEvent(
+        'security_error',
+        `Security operation failed: ${error.message}`,
+        fileId,
+        file?.name,
+        { feature: selectedFeature, error: error.message }
+      );
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  // Handle PDF encryption
+  const handleEncryption = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file.file);
+    
+    const password = passwords[file.id] || passwords.master || handleGeneratePassword();
+    formData.append('password', password);
+    formData.append('ownerPassword', password + '_owner');
+
+    const response = await fetch('/api/security/encrypt', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Encryption failed');
+    }
+
+    const encryptedPdfBlob = await response.blob();
+    
+    // Auto-download the encrypted file
+    downloadBlob(encryptedPdfBlob, `encrypted_${file.name}`);
+
+    return {
+      success: true,
+      fileName: file.name,
+      originalSize: file.size,
+      action: 'encrypt',
+      message: 'PDF encrypted successfully with password protection',
+      password: password,
+      encrypted: true,
+      downloadSize: encryptedPdfBlob.size
+    };
+  };
+
+  // Handle PDF permissions
+  const handlePermissions = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file.file);
+    formData.append('permissions', JSON.stringify(permissions));
+    
+    if (passwords[file.id] || passwords.master) {
+      formData.append('userPassword', passwords[file.id] || passwords.master);
+    }
+
+    const response = await fetch('/api/security/permissions', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Permission setting failed');
+    }
+
+    const protectedPdfBlob = await response.blob();
+    
+    // Auto-download the protected file
+    downloadBlob(protectedPdfBlob, `protected_${file.name}`);
+
+    return {
+      success: true,
+      fileName: file.name,
+      originalSize: file.size,
+      action: 'permissions',
+      message: 'Access permissions applied successfully',
+      permissions: permissions,
+      downloadSize: protectedPdfBlob.size
+    };
+  };
+
+  // Handle PDF watermarking
+  const handleWatermark = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file.file);
+    formData.append('watermarkText', watermarkSettings.text);
+    formData.append('opacity', watermarkSettings.opacity.toString());
+    formData.append('fontSize', watermarkSettings.fontSize.toString());
+    formData.append('rotation', watermarkSettings.rotation.toString());
+    formData.append('color', watermarkSettings.color);
+
+    const response = await fetch('/api/security/watermark', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Watermarking failed');
+    }
+
+    const watermarkedPdfBlob = await response.blob();
+    
+    // Auto-download the watermarked file
+    downloadBlob(watermarkedPdfBlob, `watermarked_${file.name}`);
+
+    return {
+      success: true,
+      fileName: file.name,
+      originalSize: file.size,
+      action: 'watermark',
+      message: 'Security watermark added successfully',
+      watermark: true,
+      downloadSize: watermarkedPdfBlob.size,
+      watermarkSettings: { ...watermarkSettings }
+    };
+  };
+
+  // Handle audit setup
+  const handleAuditSetup = async (file) => {
+    // Enable audit tracking for this file
+    await logSecurityEvent(
+      'audit_enabled',
+      `Audit tracking enabled for "${file.name}"`,
+      file.id,
+      file.name,
+      { auditFeatures: ['access_tracking', 'modification_tracking', 'print_tracking'] }
+    );
+
+    return {
+      success: true,
+      fileName: file.name,
+      originalSize: file.size,
+      action: 'audit',
+      message: 'Audit tracking enabled successfully',
+      auditEnabled: true,
+      trackingFeatures: ['Document access', 'Print events', 'Copy operations', 'Modification attempts']
+    };
   };
 
   // Remove file
@@ -235,12 +367,14 @@ const SecurityFeatures = () => {
     if (file) {
       addToAuditLog('file_removed', `File "${file.name}" removed from security processing`, fileId);
     }
-  };
-
-  // Copy password to clipboard
-  const copyPassword = (password) => {
-    navigator.clipboard.writeText(password);
-    // You could add a toast notification here
+  };  // Copy password to clipboard
+  const copyPassword = async (password) => {
+    const copySuccess = await copyToClipboard(password);
+    if (copySuccess) {
+      success('Password copied to clipboard');
+    } else {
+      showError('Failed to copy password to clipboard');
+    }
   };
 
   // Format timestamp
@@ -250,8 +384,9 @@ const SecurityFeatures = () => {
 
   // Render feature-specific settings
   const renderFeatureSettings = () => {
-    switch (selectedFeature) {
-      case 'encrypt':
+    switch (selectedFeature) {      case 'encrypt':
+        const passwordStrength = passwords.master ? validatePasswordStrength(passwords.master) : null;
+        
         return (
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-[#E1E6EB]">Password Settings</h4>
@@ -276,11 +411,38 @@ const SecurityFeatures = () => {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                
+                {passwordStrength && (
+                  <div className="mt-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm text-[#A0AEC0]">Strength:</span>
+                      <span className={`text-sm font-medium ${
+                        passwordStrength.strength === 'Very Strong' ? 'text-green-400' :
+                        passwordStrength.strength === 'Strong' ? 'text-blue-400' :
+                        passwordStrength.strength === 'Medium' ? 'text-yellow-400' :
+                        'text-red-400'
+                      }`}>
+                        {passwordStrength.strength}
+                      </span>
+                    </div>
+                    <div className="w-full bg-[#1B212C] rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          passwordStrength.strength === 'Very Strong' ? 'bg-green-400 w-full' :
+                          passwordStrength.strength === 'Strong' ? 'bg-blue-400 w-4/5' :
+                          passwordStrength.strength === 'Medium' ? 'bg-yellow-400 w-3/5' :
+                          passwordStrength.strength === 'Weak' ? 'bg-orange-400 w-2/5' :
+                          'bg-red-400 w-1/5'
+                        }`}
+                      ></div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               <button
                 onClick={() => {
-                  const newPassword = generateSecurePassword();
+                  const newPassword = handleGeneratePassword();
                   setPasswords(prev => ({ ...prev, master: newPassword }));
                 }}
                 className="flex items-center gap-2 px-4 py-2 bg-[#00A99D] hover:bg-[#00A99D]/90 text-white rounded-lg transition-colors"
@@ -321,9 +483,7 @@ const SecurityFeatures = () => {
               ))}
             </div>
           </div>
-        );
-
-      case 'watermark':
+        );      case 'watermark':
         return (
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-[#E1E6EB]">Security Watermark</h4>
@@ -331,29 +491,90 @@ const SecurityFeatures = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[#E1E6EB] font-medium mb-2">
-                  Watermark Type
+                  Watermark Text
                 </label>
-                <select className="w-full px-4 py-3 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] focus:outline-none focus:border-[#00A99D]">
-                  <option value="confidential">CONFIDENTIAL</option>
-                  <option value="internal">INTERNAL USE ONLY</option>
-                  <option value="draft">DRAFT</option>
-                  <option value="copy">COPY</option>
-                  <option value="custom">Custom Text</option>
-                </select>
+                <input
+                  type="text"
+                  value={watermarkSettings.text}
+                  onChange={(e) => setWatermarkSettings(prev => ({ ...prev, text: e.target.value }))}
+                  className="w-full px-4 py-3 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] focus:outline-none focus:border-[#00A99D]"
+                  placeholder="Enter watermark text"
+                />
               </div>
               
               <div>
                 <label className="block text-[#E1E6EB] font-medium mb-2">
-                  Opacity
+                  Opacity ({Math.round(watermarkSettings.opacity * 100)}%)
                 </label>
                 <input
                   type="range"
                   min="0.1"
                   max="1"
                   step="0.1"
-                  defaultValue="0.3"
+                  value={watermarkSettings.opacity}
+                  onChange={(e) => setWatermarkSettings(prev => ({ ...prev, opacity: parseFloat(e.target.value) }))}
                   className="w-full"
                 />
+              </div>
+              
+              <div>
+                <label className="block text-[#E1E6EB] font-medium mb-2">
+                  Font Size
+                </label>
+                <input
+                  type="number"
+                  min="12"
+                  max="100"
+                  value={watermarkSettings.fontSize}
+                  onChange={(e) => setWatermarkSettings(prev => ({ ...prev, fontSize: parseInt(e.target.value) }))}
+                  className="w-full px-4 py-3 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] focus:outline-none focus:border-[#00A99D]"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-[#E1E6EB] font-medium mb-2">
+                  Color
+                </label>
+                <select
+                  value={watermarkSettings.color}
+                  onChange={(e) => setWatermarkSettings(prev => ({ ...prev, color: e.target.value }))}
+                  className="w-full px-4 py-3 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] focus:outline-none focus:border-[#00A99D]"
+                >
+                  <option value="gray">Gray</option>
+                  <option value="red">Red</option>
+                  <option value="blue">Blue</option>
+                  <option value="green">Green</option>
+                  <option value="black">Black</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-[#E1E6EB] font-medium mb-2">
+                  Rotation (degrees)
+                </label>
+                <input
+                  type="number"
+                  min="-90"
+                  max="90"
+                  value={watermarkSettings.rotation}
+                  onChange={(e) => setWatermarkSettings(prev => ({ ...prev, rotation: parseInt(e.target.value) }))}
+                  className="w-full px-4 py-3 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] focus:outline-none focus:border-[#00A99D]"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-[#E1E6EB] font-medium mb-2">
+                  Position
+                </label>
+                <select
+                  value={watermarkSettings.position}
+                  onChange={(e) => setWatermarkSettings(prev => ({ ...prev, position: e.target.value }))}
+                  className="w-full px-4 py-3 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] focus:outline-none focus:border-[#00A99D]"
+                >
+                  <option value="center">Center</option>
+                  <option value="diagonal">Diagonal</option>
+                  <option value="grid">Grid Pattern</option>
+                </select>
               </div>
             </div>
           </div>
