@@ -1,13 +1,13 @@
 import React from "react";
-import Navbar from "../Components/Navbar";
-import HeroSection from "../Components/HeroSection";
-import HowItWorks from "../Components/HowItWorks";
-import PremiumFeatures from "../Components/PremiumFeatures";
+import Navbar from "../Components/Landing/Navbar";
+import HowItWorks from "../Components/Landing/HowItWorks";
+import PremiumFeatures from "../Components/Landing/PremiumFeatures";
 import UseCases from "../Components/UseCases";
-import PricingSection from "../Components/PricingSection";
-import SupportSection from "../Components/SupportSection";
-import FinalCTA from "../Components/FinalCTA";
-import Footer from "../Components/Footer";
+import PricingSection from "../Components/Landing/PricingSection";
+import SupportSection from "../Components/Landing/SupportSection";
+import FinalCTA from "../Components/Landing/FinalCTA";
+import Footer from "../Components/Landing/Footer";
+import HeroSection from "../Components/Landing/HeroSection";
 
 const Landing = ({ onNavigate }) => {
   return (

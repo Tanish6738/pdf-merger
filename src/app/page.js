@@ -29,7 +29,7 @@ const CloudIntegration = dynamic(() => import('./Components/CloudIntegration'), 
   loading: () => <div className="min-h-screen bg-[#1B212C] flex items-center justify-center"><div className="text-[#E1E6EB]">Loading Cloud Integration...</div></div>
 })
 
-const SecurityFeatures = dynamic(() => import('./Components/SecurityFeatures'), { 
+const SecurityFeatures = dynamic(() => import('./Components/Landing/SecurityFeatures'), { 
   ssr: false,
   loading: () => <div className="min-h-screen bg-[#1B212C] flex items-center justify-center"><div className="text-[#E1E6EB]">Loading Security Features...</div></div>
 })

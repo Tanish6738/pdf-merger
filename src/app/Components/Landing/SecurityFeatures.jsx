@@ -23,15 +23,15 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
-import { formatFileSize, downloadBlob } from '../utils/pdfHelpers';
+import { formatFileSize, downloadBlob } from '../../utils/pdfHelpers';
 import { 
   generateSecurePassword, 
   validatePasswordStrength, 
   logSecurityEvent, 
   copyToClipboard,
   formatFileSize as securityFormatFileSize
-} from '../utils/securityHelpers';
-import { useToast } from './ToastProvider';
+} from '../../utils/securityHelpers';
+import { useToast } from '../ToastProvider';
 
 const SecurityFeatures = ({ onNavigate }) => {
   const { success, error: showError, warning, info } = useToast();
