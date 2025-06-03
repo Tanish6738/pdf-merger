@@ -93,9 +93,8 @@ const UseCases = () => {
       stats: { users: "100K+", efficiency: "70%" },
     },
   ];
-
   return (
-    <section id="use-cases" className="py-20 bg-[#151B24]">
+    <section id="use-cases" className="py-20 bg-theme-secondary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-16"
@@ -105,36 +104,35 @@ const UseCases = () => {
           transition={{ duration: 0.6 }}
         >
           {" "}
-          <h2 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] mb-6 neon-glow">
+          <h2 className="text-4xl lg:text-5xl font-bold text-theme-text mb-6 neon-glow">
             Trusted by{" "}
             <span
-              className="text-[#00A99D] glitch-effect"
+              className="text-theme-primary glitch-effect"
               data-text="Professionals"
             >
               Professionals
             </span>{" "}
             Worldwide
           </h2>
-          <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto text-reveal">
+          <p className="text-xl text-theme-text-secondary max-w-3xl mx-auto text-reveal">
             From startups to Fortune 500 companies, see how different industries
             leverage PDFMerge Pro to streamline their document workflows.
           </p>
-        </motion.div>{" "}
-        {/* Tab Navigation */}
+        </motion.div>{" "}        {/* Tab Navigation */}
         <div className="flex justify-center mb-12">
-          <div className="bg-[#1B212C] rounded-xl p-2 border border-[#A0AEC0]/20 card-3d">
+          <div className="bg-theme-background flex gap-8 rounded-xl p-2 border border-theme-border card-3d">
             {useCases.map((useCase, index) => (
               <button
                 key={index}
                 onClick={() => setActiveTab(index)}
                 className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all duration-300 magnetic-pull ripple ${
                   activeTab === index
-                    ? "bg-[#00A99D] text-white rotating-border"
-                    : "text-[#A0AEC0] hover:text-[#E1E6EB] hover:bg-[#A0AEC0]/10"
+                    ? "btn-primary rotating-border"
+                    : "text-theme-text-secondary hover:text-theme-text hover:bg-theme-text-secondary/10"
                 }`}
               >
                 <span
-                  className={`${activeTab === index ? "text-white elastic-scale" : "text-[#00A99D] float-animation"}`}
+                  className={`${activeTab === index ? "text-white elastic-scale" : "text-theme-primary float-animation"}`}
                 >
                   {useCase.icon}
                 </span>
@@ -150,19 +148,18 @@ const UseCases = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="grid lg:grid-cols-2 gap-12 items-center"
-        >
-          {/* Content */}
+        >          {/* Content */}
           <div>
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-12 h-12 bg-[#00A99D]/10 rounded-xl flex items-center justify-center text-[#00A99D]">
+              <div className="w-12 h-12 bg-theme-primary rounded-xl flex items-center justify-center text-theme-secondary">
                 {useCases[activeTab].icon}
               </div>
-              <h3 className="text-3xl font-bold text-[#E1E6EB]">
+              <h3 className="text-3xl font-bold text-theme-text">
                 {useCases[activeTab].title}
               </h3>
             </div>
 
-            <p className="text-xl text-[#A0AEC0] mb-8 leading-relaxed">
+            <p className="text-xl text-theme-text-secondary mb-8 leading-relaxed">
               {useCases[activeTab].description}
             </p>
 
@@ -174,8 +171,7 @@ const UseCases = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <div className="w-6 h-6 bg-[#00A99D] rounded-full flex items-center justify-center flex-shrink-0">
+                >                  <div className="w-6 h-6 bg-theme-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <svg
                       className="w-3 h-3 text-white"
                       fill="currentColor"
@@ -188,35 +184,31 @@ const UseCases = () => {
                       />
                     </svg>
                   </div>
-                  <span className="text-[#E1E6EB]">{feature}</span>
+                  <span className="text-theme-text">{feature}</span>
                 </motion.div>
               ))}
-            </div>
-
-            {/* Stats */}
+            </div>            {/* Stats */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-[#00A99D] mb-1">
+              <div className="card-theme p-4 text-center">
+                <div className="text-2xl font-bold text-theme-primary mb-1">
                   {useCases[activeTab].stats.users}
                 </div>
-                <div className="text-[#A0AEC0] text-sm">Active Users</div>
+                <div className="text-theme-text-secondary text-sm">Active Users</div>
               </div>
-              <div className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-[#00A99D] mb-1">
+              <div className="card-theme p-4 text-center">
+                <div className="text-2xl font-bold text-theme-primary mb-1">
                   {useCases[activeTab].stats.efficiency}
                 </div>
-                <div className="text-[#A0AEC0] text-sm">Time Saved</div>
+                <div className="text-theme-text-secondary text-sm">Time Saved</div>
               </div>
             </div>
-          </div>
-
-          {/* Visual */}
+          </div>          {/* Visual */}
           <div className="relative">
-            <div className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-2xl p-8 relative overflow-hidden">
+            <div className="card-theme p-8 relative overflow-hidden">
               {/* Demo visualization based on use case */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-lg font-semibold text-[#E1E6EB]">
+                  <h4 className="text-lg font-semibold text-theme-text">
                     Document Workflow
                   </h4>
                   <div className="flex space-x-2">
@@ -228,17 +220,16 @@ const UseCases = () => {
 
                 {/* File simulation */}
                 <div className="space-y-3">
-                  {[1, 2, 3, 4].map((i) => (
-                    <motion.div
+                  {[1, 2, 3, 4].map((i) => (                    <motion.div
                       key={i}
-                      className="flex items-center space-x-3 p-3 bg-[#151B24] rounded-lg border border-[#A0AEC0]/10"
+                      className="flex items-center space-x-3 p-3 bg-theme-secondary rounded-lg border border-theme-border-opaque-10"
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.1 }}
                     >
-                      <div className="w-8 h-8 bg-[#00A99D]/20 rounded flex items-center justify-center">
+                      <div className="w-8 h-8 bg-theme-primary rounded flex items-center justify-center text-white">
                         <svg
-                          className="w-4 h-4 text-[#00A99D]"
+                          className="w-4 h-4 text-theme-secondary"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -250,10 +241,10 @@ const UseCases = () => {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <div className="text-[#E1E6EB] text-sm">
+                        <div className="text-theme-text text-sm">
                           Document_{i}.pdf
                         </div>
-                        <div className="text-[#A0AEC0] text-xs">2.{i}MB</div>
+                        <div className="text-theme-text-secondary text-xs">2.{i}MB</div>
                       </div>
                       <div className="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center">
                         <svg
@@ -270,10 +261,8 @@ const UseCases = () => {
                       </div>
                     </motion.div>
                   ))}
-                </div>
-
-                <div className="flex items-center justify-center py-4">
-                  <div className="flex items-center space-x-2 text-[#00A99D]">
+                </div>                <div className="flex items-center justify-center py-4">
+                  <div className="flex items-center space-x-2 text-theme-primary">
                     <svg
                       className="w-5 h-5"
                       fill="none"
@@ -289,16 +278,14 @@ const UseCases = () => {
                     </svg>
                     <span className="text-sm font-medium">Merging...</span>
                   </div>
-                </div>
-
-                <motion.div
-                  className="p-4 bg-[#00A99D]/10 border border-[#00A99D]/30 rounded-lg"
+                </div>                <motion.div
+                  className="p-4 bg-theme-primary-opaque-10 border border-theme-primary-opaque-30 rounded-lg"
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.6 }}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-[#00A99D] rounded flex items-center justify-center">
+                    <div className="w-10 h-10 bg-theme-primary rounded flex items-center justify-center">
                       <svg
                         className="w-5 h-5 text-white"
                         fill="currentColor"
@@ -312,20 +299,18 @@ const UseCases = () => {
                       </svg>
                     </div>
                     <div>
-                      <div className="text-[#E1E6EB] font-medium">
+                      <div className="text-theme-text font-medium">
                         Merged_Document.pdf
                       </div>
-                      <div className="text-[#A0AEC0] text-sm">
+                      <div className="text-theme-text-secondary text-sm">
                         8.7MB • Ready for download
                       </div>
                     </div>
                   </div>
                 </motion.div>
-              </div>
-
-              {/* Background decoration */}
-              <div className="absolute top-4 right-4 w-16 h-16 bg-[#00A99D]/5 rounded-full"></div>
-              <div className="absolute bottom-4 left-4 w-12 h-12 bg-[#00A99D]/5 rounded-full"></div>
+              </div>              {/* Background decoration */}
+              <div className="absolute top-4 right-4 w-16 h-16 bg-theme-primary-opaque-5 rounded-full"></div>
+              <div className="absolute bottom-4 left-4 w-12 h-12 bg-theme-primary-opaque-5 rounded-full"></div>
             </div>
           </div>
         </motion.div>

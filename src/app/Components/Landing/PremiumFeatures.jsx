@@ -149,11 +149,10 @@ const PremiumFeatures = () => {
       highlight: "Priority Support",
     },
   ];
-
   return (
     <section
       id="features"
-      className="py-20 bg-gradient-to-b from-[#1B212C] to-[#151B24]"
+      className="py-20 bg-gradient-to-b from-theme-background to-theme-secondary"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -163,10 +162,10 @@ const PremiumFeatures = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] mb-6">
-            Unlock Premium PDF <span className="text-[#00A99D]">Power</span>
+          <h2 className="text-4xl lg:text-5xl font-bold text-theme-text mb-6">
+            Unlock Premium PDF <span className="text-theme-primary">Power</span>
           </h2>
-          <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto">
+          <p className="text-xl text-theme-text-secondary max-w-3xl mx-auto">
             Experience advanced features designed for professionals who demand
             more from their PDF tools. Every feature built with precision and
             purpose.
@@ -183,30 +182,30 @@ const PremiumFeatures = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <div className="h-full bg-[#1B212C] border border-[#A0AEC0]/20 rounded-2xl p-8 hover:border-[#00A99D]/50 transition-all duration-300 relative overflow-hidden">
+              {" "}
+              <div className="h-full card-theme p-8 hover:border-theme-primary transition-all duration-300 relative overflow-hidden">
                 {/* Background gradient on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#00A99D]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                 {/* Highlight badge */}
                 <div className="absolute top-4 right-4">
-                  <span className="inline-block bg-[#00A99D]/20 text-[#00A99D] text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="inline-block bg-theme-primary text-secondary text-xs font-semibold px-3 py-1 rounded-full">
                     {feature.highlight}
                   </span>
                 </div>
 
                 {/* Icon */}
                 <div className="relative z-10 mb-6">
-                  <div className="w-16 h-16 bg-[#00A99D]/10 rounded-xl flex items-center justify-center text-[#00A99D] group-hover:bg-[#00A99D]/20 group-hover:scale-110 transition-all duration-300">
+                  <div className="w-16 h-16 bg-theme-primary rounded-xl flex items-center justify-center text-white group-hover:bg-theme-primary-opaque-20 group-hover:scale-110 transition-all duration-300">
                     {feature.icon}
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="relative z-10">
-                  <h3 className="text-xl font-bold text-[#E1E6EB] mb-4 group-hover:text-[#00A99D] transition-colors duration-300">
+                  <h3 className="text-xl font-bold text-theme-text mb-4 group-hover:text-theme-primary transition-colors duration-300">
                     {feature.title}
                   </h3>
-                  <p className="text-[#A0AEC0] leading-relaxed">
+                  <p className="text-theme-text-secondary leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -216,9 +215,7 @@ const PremiumFeatures = () => {
               </div>
             </motion.div>
           ))}
-        </div>
-
-        {/* Bottom CTA */}
+        </div>        {/* Bottom CTA */}
         <motion.div
           className="text-center mt-16"
           initial={{ opacity: 0, y: 30 }}
@@ -226,17 +223,17 @@ const PremiumFeatures = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.8 }}
         >
-          <div className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-2xl p-8 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-[#E1E6EB] mb-4">
+          <div className="rounded-2xl p-8 max-w-4xl mx-auto bg-theme-secondary bg-opacity-90 shadow-lg text-theme-text">
+            <h3 className="text-2xl font-bold text-theme-text mb-4">
               Ready to experience the difference?
             </h3>
-            <p className="text-[#A0AEC0] mb-6">
+            <p className="text-theme-text-secondary mb-6">
               Join thousands of professionals who trust PDFMerge Pro for their
               critical document workflows.
             </p>{" "}
             <motion.button
               onClick={handleTrialClick}
-              className="bg-[#00A99D] hover:bg-[#00A99D]/90 text-white px-8 py-4 rounded-lg font-semibold transition-colors duration-300"
+              className="bg-theme-primary hover:bg-theme-primary/90 text-white px-8 py-4 rounded-lg font-semibold transition-colors duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

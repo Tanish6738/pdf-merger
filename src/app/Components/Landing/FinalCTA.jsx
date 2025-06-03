@@ -23,11 +23,11 @@ const FinalCTA = () => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-[#1B212C] via-[#151B24] to-[#1B212C] relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-theme-background via-theme-secondary to-theme-background relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#00A99D] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-[#00A99D] rounded-full blur-3xl"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-theme-primary rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-theme-primary rounded-full blur-3xl"></div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -37,21 +37,22 @@ const FinalCTA = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl lg:text-6xl font-bold text-[#E1E6EB] mb-6 leading-tight">
+          {" "}
+          <h2 className="text-4xl lg:text-6xl font-bold text-theme-text mb-6 leading-tight">
             Ready to Experience
-            <span className="block text-[#00A99D]">Seamless PDF Merging?</span>
+            <span className="block text-theme-primary">
+              Seamless PDF Merging?
+            </span>
           </h2>
-
-          <p className="text-xl lg:text-2xl text-[#A0AEC0] mb-12 leading-relaxed">
+          <p className="text-xl lg:text-2xl text-theme-text-secondary mb-12 leading-relaxed">
             Save time, improve organization, and ensure document integrity. Join
             thousands of professionals who trust PDFMerge Pro.
-          </p>
-
+          </p>{" "}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
             {" "}
             <motion.button
               onClick={handleStartTrial}
-              className="bg-[#00A99D] hover:bg-[#00A99D]/90 text-white px-10 py-5 rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="btn-primary px-10 py-5 rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -59,15 +60,14 @@ const FinalCTA = () => {
             </motion.button>
             <motion.button
               onClick={handleScheduleDemo}
-              className="border-2 border-[#00A99D] text-[#00A99D] hover:bg-[#00A99D] hover:text-white px-10 py-5 rounded-xl text-lg font-semibold transition-all duration-300"
+              className="btn-outline-primary border-2 px-10 py-5 rounded-xl text-lg font-semibold transition-all duration-300"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
               Schedule Demo
             </motion.button>
           </div>
-
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8 text-[#A0AEC0]">
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8 text-theme-text-secondary">
             <div className="flex items-center space-x-2">
               <svg
                 className="w-5 h-5 text-green-500"
@@ -111,16 +111,15 @@ const FinalCTA = () => {
               <span>Cancel anytime</span>
             </div>
           </div>
-        </motion.div>
-
+        </motion.div>{" "}
         {/* Floating elements */}
         <motion.div
-          className="absolute top-10 left-10 w-16 h-16 bg-[#00A99D]/20 rounded-full flex items-center justify-center"
+          className="absolute top-10 left-10 w-16 h-16 bg-theme-primary rounded-full flex items-center justify-center"
           animate={{ y: [-10, 10, -10], rotate: [0, 180, 360] }}
           transition={{ repeat: Infinity, duration: 6 }}
         >
           <svg
-            className="w-8 h-8 text-[#00A99D]"
+            className="w-8 h-8 text-theme-secondary"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -131,14 +130,13 @@ const FinalCTA = () => {
             />
           </svg>
         </motion.div>
-
         <motion.div
-          className="absolute top-20 right-20 w-12 h-12 bg-[#00A99D]/30 rounded-lg flex items-center justify-center"
+          className="absolute top-20 right-20 w-12 h-12 bg-theme-primary rounded-lg flex items-center justify-center"
           animate={{ x: [-5, 5, -5], rotate: [0, -180, -360] }}
           transition={{ repeat: Infinity, duration: 4 }}
         >
           <svg
-            className="w-6 h-6 text-[#00A99D]"
+            className="w-6 h-6 text-theme-secondary"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -148,15 +146,14 @@ const FinalCTA = () => {
               clipRule="evenodd"
             />
           </svg>
-        </motion.div>
-
+        </motion.div>{" "}
         <motion.div
-          className="absolute bottom-10 left-20 w-20 h-20 bg-[#00A99D]/10 rounded-full flex items-center justify-center"
+          className="absolute bottom-10 left-20 w-20 h-20 bg-theme-primary rounded-full flex items-center justify-center"
           animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 3 }}
         >
           <svg
-            className="w-10 h-10 text-[#00A99D]"
+            className="w-10 h-10 text-theme-secondary "
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

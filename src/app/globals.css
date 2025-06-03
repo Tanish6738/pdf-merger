@@ -3,6 +3,23 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Default theme variables */
+  --color-primary: #00A99D;
+  --color-background: #1B212C;
+  --color-secondary: #151B24;
+  --color-text: #E1E6EB;
+  --color-textSecondary: #A0AEC0;
+  --color-border: #A0AEC0;
+  --color-accent: #00A99D;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  
+  /* Accessibility variables */
+  --font-size-base: 16px;
+  --contrast-filter: none;
+  --motion-duration: 0.3s;
 }
 
 @theme inline {
@@ -20,7 +37,282 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-background, var(--background));
+  color: var(--color-text, var(--foreground));
   font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--font-size-base, 16px);
+  filter: var(--contrast-filter, none);
+  transition: background-color var(--motion-duration, 0.3s), 
+              color var(--motion-duration, 0.3s),
+              filter var(--motion-duration, 0.3s);
+}
+
+/* Apply motion settings globally */
+*,
+*::before,
+*::after {
+  transition-duration: var(--motion-duration, 0.3s);
+}
+
+/* High contrast mode styles */
+.high-contrast {
+  --color-background: #000000;
+  --color-text: #ffffff;
+  --color-border: #ffffff;
+  --color-primary: #00ff00;
+  --color-accent: #00ff00;
+}
+
+.high-contrast input,
+.high-contrast select,
+.high-contrast textarea {
+  border: 2px solid var(--color-border) !important;
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+
+/* Focus indicators */
+.focus-indicators *:focus {
+  outline: 3px solid var(--color-primary) !important;
+  outline-offset: 2px !important;
+}
+
+.focus-indicators input:focus,
+.focus-indicators select:focus,
+.focus-indicators textarea:focus
+ {
+  box-shadow: 0 0 0 3px var(--color-primary) !important;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Theme-aware utility classes */
+.bg-theme-background {
+  background-color: var(--color-background);
+}
+
+.bg-theme-secondary {
+  background-color: var(--color-secondary);
+}
+
+.bg-theme-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-theme-primary-opaque-10 {
+  background-color: var(--color-primary);
+  opacity: 0.1;
+}
+
+.bg-theme-primary-opaque-20 {
+  background-color: var(--color-primary);
+  opacity: 0.2;
+}
+
+.bg-theme-primary-opaque-30 {
+  background-color: var(--color-primary);
+  opacity: 0.3;
+}
+
+.bg-theme-primary-opaque-50 {
+  background-color: var(--color-primary);
+  opacity: 0.5;
+}
+
+.bg-theme-primary-opaque-60 {
+  background-color: var(--color-primary);
+  opacity: 0.6;
+}
+
+.bg-theme-primary-opaque-70 {
+  background-color: var(--color-primary);
+  opacity: 0.7;
+}
+
+.bg-theme-primary-opaque-80 {
+  background-color: var(--color-primary);
+  opacity: 0.8;
+}
+
+.bg-theme-secondary-opaque-80 {
+  background-color: var(--color-secondary);
+  opacity: 0.8;
+}
+
+.bg-theme-secondary-opaque-90 {
+  background-color: var(--color-secondary);
+  opacity: 0.9;
+}
+
+.text-theme-primary {
+  color: var(--color-primary);
+}
+
+.text-theme-text {
+  color: var(--color-text);
+}
+
+.text-theme-text-secondary {
+  color: var(--color-textSecondary);
+}
+
+.text-theme-background {
+  color: var(--color-background);
+}
+
+.border-theme-primary {
+  border-color: var(--color-primary);
+}
+
+.border-theme-border {
+  border-color: var(--color-border);
+}
+
+.border-theme-border-opaque-20 {
+  border-color: var(--color-border);
+  opacity: 0.2;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  transition: all var(--motion-duration, 0.3s);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  transition: all var(--motion-duration, 0.3s);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Layout helpers */
+.backdrop-blur-theme {
+  backdrop-filter: blur(4px);
+  background-color: var(--color-background);
+}
+
+.backdrop-blur-theme-secondary {
+  backdrop-filter: blur(4px);
+  background-color: var(--color-secondary);
+}
+
+/* Additional theme utility classes */
+.bg-hardcoded-151b24 {
+  background-color: #151B24;
+}
+
+.bg-hardcoded-1b212c {
+  background-color: #1B212C;
+}
+
+.text-hardcoded-e1e6eb {
+  color: #E1E6EB;
+}
+
+.text-hardcoded-a0aec0 {
+  color: #A0AEC0;
+}
+
+.text-hardcoded-00a99d {
+  color: #00A99D;
+}
+
+.border-hardcoded-a0aec0-20 {
+  border-color: rgba(160, 174, 192, 0.2);
+}
+
+.border-hardcoded-00a99d-50 {
+  border-color: rgba(0, 169, 157, 0.5);
+}
+
+.hover\:border-hardcoded-00a99d-50:hover {
+  border-color: rgba(0, 169, 157, 0.5);
+}
+
+.hover\:text-hardcoded-00a99d:hover {
+  color: #00A99D;
+}
+
+.hover\:bg-hardcoded-00a99d:hover {
+  background-color: #00A99D;
+}
+
+.hover\:bg-hardcoded-00a99d-90:hover {
+  background-color: rgba(0, 169, 157, 0.9);
+}
+
+.bg-hardcoded-00a99d {
+  background-color: #00A99D;
+}
+
+.bg-hardcoded-00a99d-10 {
+  background-color: rgba(0, 169, 157, 0.1);
+}
+
+.bg-hardcoded-00a99d-20 {
+  background-color: rgba(0, 169, 157, 0.2);
+}
+
+/* Card and container styles */
+.card-theme {
+  background-color: var(--color-secondary);
+  border: 1px solid rgba(160, 174, 192, 0.2);
+  border-radius: 1rem;
+  transition: all var(--motion-duration, 0.3s);
+}
+
+.card-theme:hover {
+  border-color: rgba(0, 169, 157, 0.5);
+}
+
+.container-theme {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+/* Gradient backgrounds */
+.bg-gradient-theme {
+  background: linear-gradient(to bottom, var(--color-secondary), var(--color-background));
+}
+
+/* Input and form styles */
+.input-theme {
+  background-color: var(--color-secondary);
+  border: 1px solid rgba(160, 174, 192, 0.2);
+  color: var(--color-text);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  transition: all var(--motion-duration, 0.3s);
+}
+
+.input-theme:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.input-theme::placeholder {
+  color: var(--color-textSecondary);
 }

@@ -220,10 +220,10 @@ const SupportSection = () => {
   return (
     <section
       id="support"
-      className="py-20 bg-gradient-to-b from-[#151B24] to-[#1B212C]"
+      className="py-20 bg-gradient-to-b from-theme-secondary to-theme-background"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+        {/* Section Header */}
         <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -231,17 +231,16 @@ const SupportSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          {" "}
-          <h2 className="text-4xl lg:text-5xl font-bold text-[#E1E6EB] mb-6">
-            We're Here to <span className="text-[#00A99D]">Help</span>
+          <h2 className="text-4xl lg:text-5xl font-bold text-theme-text mb-6">
+            We're Here to <span className="text-theme-primary">Help</span>
           </h2>
-          <p className="text-xl text-[#A0AEC0] max-w-3xl mx-auto">
+          <p className="text-xl text-theme-text-secondary max-w-3xl mx-auto">
             Get the support you need to make the most of PDFMerge Pro. Our team
             is dedicated to your success.
           </p>
         </motion.div>
 
-        {/* Support Navigation Tabs */}
+        {/* Support Tabs */}
         <motion.div
           className="flex justify-center mb-12"
           initial={{ opacity: 0, y: 20 }}
@@ -249,15 +248,15 @@ const SupportSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <div className="bg-[#1B212C] rounded-xl p-2 border border-[#A0AEC0]/20">
+          <div className="bg-theme-background rounded-xl p-2 border border-theme-border flex items-center justify-center gap-8">
             {supportTabs.map((tab, index) => (
               <button
                 key={index}
                 onClick={() => setActiveTab(index)}
                 className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all duration-300 ${
                   activeTab === index
-                    ? "bg-[#00A99D] text-white"
-                    : "text-[#A0AEC0] hover:text-[#E1E6EB]"
+                    ? "btn-primary"
+                    : "text-theme-text-secondary hover:text-theme-text"
                 }`}
               >
                 <span className="text-lg">{tab.icon}</span>
@@ -279,15 +278,15 @@ const SupportSection = () => {
             <div className="space-y-8">
               {/* FAQ Categories */}
               <div className="flex justify-center mb-8">
-                <div className="bg-[#1B212C] rounded-lg p-1 border border-[#A0AEC0]/20">
+                <div className="bg-theme-background rounded-lg p-1 border border-theme-border">
                   {Object.keys(faqCategories).map((category) => (
                     <button
                       key={category}
                       onClick={() => setSelectedCategory(category)}
                       className={`px-6 py-2 rounded-md transition-all duration-300 ${
                         selectedCategory === category
-                          ? "bg-[#00A99D] text-white"
-                          : "text-[#A0AEC0] hover:text-[#E1E6EB]"
+                          ? "bg-theme-primary text-white"
+                          : "text-theme-text-secondary hover:text-theme-text"
                       }`}
                     >
                       {category}
@@ -301,15 +300,15 @@ const SupportSection = () => {
                 {faqCategories[selectedCategory].map((faq, index) => (
                   <motion.div
                     key={index}
-                    className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-xl p-6 hover:border-[#00A99D]/50 transition-all duration-300"
+                    className="bg-theme-background border border-theme-border rounded-xl p-6 hover:border-theme-primary transition-all duration-300"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    <h3 className="text-lg font-semibold text-[#E1E6EB] mb-3">
+                    <h3 className="text-lg font-semibold text-theme-text mb-3">
                       {faq.question}
                     </h3>
-                    <p className="text-[#A0AEC0] leading-relaxed">
+                    <p className="text-theme-text-secondary leading-relaxed">
                       {faq.answer}
                     </p>
                   </motion.div>
@@ -324,30 +323,30 @@ const SupportSection = () => {
               {contactMethods.map((method, index) => (
                 <motion.div
                   key={index}
-                  className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-xl p-6 hover:border-[#00A99D]/50 transition-all duration-300 cursor-pointer group"
-                  onClick={method.action}
+                  className="card-theme p-6 hover:border-theme-primary transition-all duration-300 cursor-pointer group"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   whileHover={{ scale: 1.02 }}
+                  onClick={method.action}
                 >
                   <div className="text-center">
                     <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
                       {method.icon}
                     </div>
-                    <h3 className="text-lg font-semibold text-[#E1E6EB] mb-2">
+                    <h3 className="text-lg font-semibold text-theme-text mb-2">
                       {method.name}
                     </h3>
-                    <p className="text-[#A0AEC0] text-sm mb-4">
+                    <p className="text-theme-text-secondary text-sm mb-4">
                       {method.description}
                     </p>
-                    <div className="space-y-2 text-xs text-[#A0AEC0]">
+                    <div className="space-y-2 text-xs text-theme-text-secondary">
                       <div className="flex items-center justify-center space-x-2">
-                        <span className="w-2 h-2 bg-[#00A99D] rounded-full"></span>
+                        <span className="w-2 h-2 bg-theme-primary rounded-full"></span>
                         <span>{method.available}</span>
                       </div>
-                      <div className="text-[#00A99D] font-medium">
+                      <div className="text-theme-primary font-medium">
                         {method.response}
                       </div>
                     </div>
@@ -360,14 +359,14 @@ const SupportSection = () => {
           {/* Submit Ticket Tab */}
           {activeTab === 2 && (
             <div className="max-w-2xl mx-auto">
-              <div className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-xl p-8">
-                <h3 className="text-2xl font-bold text-[#E1E6EB] mb-6 text-center">
+              <div className="bg-theme-background border border-theme-border rounded-xl p-8">
+                <h3 className="text-2xl font-bold text-theme-text mb-6 text-center">
                   Submit a Support Ticket
                 </h3>
                 <form onSubmit={handleTicketSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-[#E1E6EB] font-medium mb-2">
+                      <label className="block text-theme-text font-medium mb-2">
                         Full Name *
                       </label>
                       <input
@@ -376,12 +375,12 @@ const SupportSection = () => {
                         value={ticketForm.name}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 bg-[#151B24] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] placeholder-[#A0AEC0] focus:outline-none focus:border-[#00A99D] transition-colors duration-300"
+                        className="w-full px-4 py-3 bg-theme-secondary border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-theme-primary transition-colors duration-300"
                         placeholder="Enter your full name"
                       />
                     </div>
                     <div>
-                      <label className="block text-[#E1E6EB] font-medium mb-2">
+                      <label className="block text-theme-text font-medium mb-2">
                         Email Address *
                       </label>
                       <input
@@ -390,7 +389,7 @@ const SupportSection = () => {
                         value={ticketForm.email}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 bg-[#151B24] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] placeholder-[#A0AEC0] focus:outline-none focus:border-[#00A99D] transition-colors duration-300"
+                        className="w-full px-4 py-3 bg-theme-secondary border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-theme-primary transition-colors duration-300"
                         placeholder="your@email.com"
                       />
                     </div>
@@ -398,14 +397,14 @@ const SupportSection = () => {
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-[#E1E6EB] font-medium mb-2">
+                      <label className="block text-theme-text font-medium mb-2">
                         Category
                       </label>
                       <select
                         name="category"
                         value={ticketForm.category}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-[#151B24] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] focus:outline-none focus:border-[#00A99D] transition-colors duration-300"
+                        className="w-full px-4 py-3 bg-theme-secondary border border-theme-border rounded-lg text-theme-text focus:outline-none focus:border-theme-primary transition-colors duration-300"
                       >
                         <option value="General">General Question</option>
                         <option value="Technical">Technical Issue</option>
@@ -415,14 +414,14 @@ const SupportSection = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[#E1E6EB] font-medium mb-2">
+                      <label className="block text-theme-text font-medium mb-2">
                         Priority
                       </label>
                       <select
                         name="priority"
                         value={ticketForm.priority}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-[#151B24] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] focus:outline-none focus:border-[#00A99D] transition-colors duration-300"
+                        className="w-full px-4 py-3 bg-theme-secondary border border-theme-border rounded-lg text-theme-text focus:outline-none focus:border-theme-primary transition-colors duration-300"
                       >
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
@@ -433,7 +432,7 @@ const SupportSection = () => {
                   </div>
 
                   <div>
-                    <label className="block text-[#E1E6EB] font-medium mb-2">
+                    <label className="block text-theme-text font-medium mb-2">
                       Subject *
                     </label>
                     <input
@@ -442,13 +441,13 @@ const SupportSection = () => {
                       value={ticketForm.subject}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 bg-[#151B24] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] placeholder-[#A0AEC0] focus:outline-none focus:border-[#00A99D] transition-colors duration-300"
+                      className="w-full px-4 py-3 bg-theme-secondary border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-theme-primary transition-colors duration-300"
                       placeholder="Brief description of your issue"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#E1E6EB] font-medium mb-2">
+                    <label className="block text-theme-text font-medium mb-2">
                       Message *
                     </label>
                     <textarea
@@ -457,14 +456,14 @@ const SupportSection = () => {
                       onChange={handleInputChange}
                       required
                       rows="6"
-                      className="w-full px-4 py-3 bg-[#151B24] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] placeholder-[#A0AEC0] focus:outline-none focus:border-[#00A99D] transition-colors duration-300 resize-vertical"
+                      className="w-full px-4 py-3 bg-theme-secondary border border-theme-border rounded-lg text-theme-text placeholder-theme-text-secondary focus:outline-none focus:border-theme-primary transition-colors duration-300 resize-vertical"
                       placeholder="Please provide detailed information about your question or issue..."
                     ></textarea>
                   </div>
 
                   <motion.button
                     type="submit"
-                    className="w-full bg-[#00A99D] hover:bg-[#00A99D]/90 text-white px-6 py-4 rounded-lg font-semibold transition-all duration-300"
+                    className="w-full btn-primary px-6 py-4 rounded-lg font-semibold transition-all duration-300"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -481,7 +480,7 @@ const SupportSection = () => {
               {resources.map((resource, index) => (
                 <motion.div
                   key={index}
-                  className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-xl p-6 hover:border-[#00A99D]/50 transition-all duration-300 cursor-pointer group"
+                  className="card-theme p-6 hover:border-theme-primary transition-all duration-300 cursor-pointer group"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -493,10 +492,10 @@ const SupportSection = () => {
                     <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
                       {resource.icon}
                     </div>
-                    <h3 className="text-lg font-semibold text-[#E1E6EB] mb-2 group-hover:text-[#00A99D] transition-colors duration-300">
+                    <h3 className="text-lg font-semibold text-theme-text mb-2 group-hover:text-theme-primary transition-colors duration-300">
                       {resource.title}
                     </h3>
-                    <p className="text-[#A0AEC0] text-sm">
+                    <p className="text-theme-text-secondary text-sm">
                       {resource.description}
                     </p>
                   </div>
@@ -508,23 +507,23 @@ const SupportSection = () => {
 
         {/* Bottom CTA */}
         <motion.div
-          className="text-center mt-16 pt-12 border-t border-[#A0AEC0]/20"
+          className="text-center my-16 pt-12 border-t border-theme-border"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <h3 className="text-2xl font-bold text-[#E1E6EB] mb-4">
+          <h3 className="text-2xl font-bold text-theme-text mb-4">
             Still need help?
           </h3>
-          <p className="text-[#A0AEC0] mb-6">
+          <p className="text-theme-text-secondary mb-6">
             Our support team is standing by to help you succeed with PDFMerge
             Pro.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <motion.button
               onClick={() => handleContactMethod("chat")}
-              className="bg-[#00A99D] hover:bg-[#00A99D]/90 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300"
+              className="btn-primary px-8 py-3 rounded-lg font-semibold transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -532,16 +531,15 @@ const SupportSection = () => {
             </motion.button>
             <motion.button
               onClick={() => setActiveTab(2)}
-              className="border-2 border-[#00A99D] text-[#00A99D] hover:bg-[#00A99D] hover:text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300"
+              className="btn-outline-primary px-8 py-3 rounded-lg font-semibold transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               Submit Ticket
             </motion.button>
-          </div>{" "}
+          </div>
         </motion.div>
 
-        {/* Customer Service Component */}
         <CustomerService />
       </div>
     </section>

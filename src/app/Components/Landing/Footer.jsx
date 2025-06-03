@@ -79,8 +79,7 @@ const Footer = () => {
     }
   ];
 
-  return (
-    <footer className="bg-[#151B24] border-t border-[#A0AEC0]/20">
+  return (    <footer className="bg-theme-secondary border-t border-theme-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid lg:grid-cols-6 gap-8">
           {/* Brand section */}
@@ -90,17 +89,16 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-          >
-            <div className="flex items-center mb-6">
-              <div className="w-10 h-10 bg-[#00A99D] rounded-lg flex items-center justify-center mr-3">
+          >            <div className="flex items-center mb-6">
+              <div className="w-10 h-10 bg-theme-primary rounded-lg flex items-center justify-center mr-3">
                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
                 </svg>
               </div>
-              <span className="text-2xl font-bold text-[#E1E6EB]">PDFMerge Pro</span>
+              <span className="text-2xl font-bold text-theme-text">PDFMerge Pro</span>
             </div>
             
-            <p className="text-[#A0AEC0] mb-6 leading-relaxed">
+            <p className="text-theme-text-secondary mb-6 leading-relaxed">
               The ultimate PDF merger for professionals and businesses. Combine, organize, 
               and secure your documents with enterprise-grade tools and unmatched reliability.
             </p>
@@ -125,13 +123,12 @@ const Footer = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-            >
-              <h3 className="text-[#E1E6EB] font-semibold mb-6">{category}</h3>
+            >              <h3 className="text-theme-text font-semibold mb-6">{category}</h3>
               <ul className="space-y-4">
                 {links.map((link) => (
                   <li key={link.name}>                    <a
                       href={link.href}
-                      className="text-[#A0AEC0] hover:text-[#00A99D] transition-colors duration-300 magnetic-pull ripple"
+                      className="text-theme-text-secondary hover:text-theme-primary transition-colors duration-300 magnetic-pull ripple"
                     >
                       {link.name}
                     </a>
@@ -142,9 +139,8 @@ const Footer = () => {
           ))}
         </div>
 
-        {/* Newsletter signup */}
-        <motion.div
-          className="mt-16 pt-8 border-t border-[#A0AEC0]/20"
+        {/* Newsletter signup */}        <motion.div
+          className="mt-16 pt-8 border-t border-theme-border"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -152,24 +148,23 @@ const Footer = () => {
         >
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-xl font-bold text-[#E1E6EB] mb-2">
+              <h3 className="text-xl font-bold text-theme-text mb-2">
                 Stay updated with PDFMerge Pro
               </h3>
-              <p className="text-[#A0AEC0]">
+              <p className="text-theme-text-secondary">
                 Get the latest features, tips, and updates delivered to your inbox.
               </p>
-            </div>            
-            <form onSubmit={handleNewsletterSubscribe} className="flex flex-col sm:flex-row gap-3">
-              <input
+            </div>
+            <form onSubmit={handleNewsletterSubscribe} className="flex flex-col sm:flex-row gap-3">              <input
                 type="email"
                 name="email"
                 placeholder="Enter your email"
                 required
-                className="flex-1 px-4 py-3 bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] placeholder-[#A0AEC0] focus:outline-none focus:border-[#00A99D] transition-colors duration-300"
+                className="input-theme flex-1"
               />
               <button 
                 type="submit"
-                className="bg-[#00A99D] hover:bg-[#00A99D]/90 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-300 whitespace-nowrap"
+                className="btn-primary px-6 py-3 rounded-lg font-semibold transition-colors duration-300 whitespace-nowrap"
               >
                 Subscribe
               </button>
@@ -177,16 +172,15 @@ const Footer = () => {
           </div>
         </motion.div>
 
-        {/* Bottom section */}
-        <motion.div
-          className="mt-16 pt-8 border-t border-[#A0AEC0]/20"
+        {/* Bottom section */}        <motion.div
+          className="mt-16 pt-8 border-t border-theme-border"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 1 }}
         >
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-[#A0AEC0] text-sm">
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-theme-text-secondary text-sm">
               <p>&copy; 2025 PDFMerge Pro. All rights reserved.</p>
               <div className="flex items-center space-x-4">
                 <span>🔒 SOC 2 Type II Certified</span>

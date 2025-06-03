@@ -121,11 +121,10 @@ const CustomerService = () => {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.3 }}
-      >
-        {!chatOpen ? (
+      >        {!chatOpen ? (
           <motion.button
             onClick={() => setChatOpen(true)}
-            className="bg-[#00A99D] hover:bg-[#00A99D]/90 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
+            className="btn-primary text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -144,15 +143,15 @@ const CustomerService = () => {
             </svg>
             <span className="hidden sm:inline font-medium">Need Help?</span>
           </motion.button>
-        ) : (
-          <motion.div
-            className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-lg shadow-2xl w-80 sm:w-96 max-h-96 flex flex-col"
+        ) : (          <motion.div
+            className="bg-theme-background border-theme-border border rounded-lg shadow-2xl w-80 sm:w-96 max-h-96 flex flex-col"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-          >
-            {/* Chat Header */}
-            <div className="bg-[#00A99D] text-white p-4 rounded-t-lg flex items-center justify-between">
+          >            {/* Chat Header */}
+            <div
+              className="bg-theme-primary text-white p-4 rounded-t-lg flex items-center justify-between"
+            >
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                   <span className="text-sm font-bold">CS</span>
@@ -189,30 +188,33 @@ const CustomerService = () => {
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
+                  className={`flex ${
+                    msg.type === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >                  <div
                     className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                      msg.type === "user"
-                        ? "bg-[#00A99D] text-white"
-                        : "bg-[#151B24] text-[#E1E6EB] border border-[#A0AEC0]/20"
+                      msg.type === "user" 
+                        ? "bg-theme-primary text-white" 
+                        : "bg-theme-secondary border border-theme-border text-theme-text"
                     }`}
                   >
-                    <p>{msg.message}</p>
+                    <p>{msg.message}</p>{" "}
                     <p
-                      className={`text-xs mt-1 ${msg.type === "user" ? "text-white/70" : "text-[#A0AEC0]"}`}
+                      className={`text-xs mt-1 ${
+                        msg.type === "user"
+                          ? "text-white opacity-70"
+                          : "text-theme-text-secondary"
+                      }`}
                     >
                       {msg.timestamp}
                     </p>
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* Chat Input */}
+            </div>            {/* Chat Input */}
             <form
               onSubmit={handleSendMessage}
-              className="p-4 border-t border-[#A0AEC0]/20"
+              className="p-4 border-t border-theme-border"
             >
               <div className="flex space-x-2">
                 <input
@@ -220,11 +222,11 @@ const CustomerService = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder="Type your message..."
-                  className="flex-1 px-3 py-2 bg-[#151B24] border border-[#A0AEC0]/20 rounded-lg text-[#E1E6EB] placeholder-[#A0AEC0] focus:outline-none focus:border-[#00A99D] transition-colors text-sm"
+                  className="input-theme flex-1 text-sm"
                 />
                 <button
                   type="submit"
-                  className="bg-[#00A99D] hover:bg-[#00A99D]/90 text-white p-2 rounded-lg transition-colors"
+                  className="btn-primary text-white p-2 rounded-lg transition-colors"
                 >
                   <svg
                     className="w-4 h-4"
@@ -244,10 +246,8 @@ const CustomerService = () => {
             </form>
           </motion.div>
         )}
-      </motion.div>
-
-      {/* Quick Actions Section (for support page) */}
-      <div className="py-12 bg-[#151B24]">
+      </motion.div>      {/* Quick Actions Section (for support page) */}
+      <div className="py-12 bg-theme-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="text-center mb-12"
@@ -256,19 +256,17 @@ const CustomerService = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h3 className="text-3xl font-bold text-[#E1E6EB] mb-4">
+            <h3 className="text-3xl font-bold mb-4 text-theme-text">
               Quick Actions
             </h3>
-            <p className="text-[#A0AEC0] max-w-2xl mx-auto">
+            <p className="max-w-2xl mx-auto text-theme-text-secondary">
               Get started quickly with these common tasks and resources.
             </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          </motion.div>          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickActions.map((action, index) => (
               <motion.div
                 key={index}
-                className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-xl p-6 hover:border-[#00A99D]/50 transition-all duration-300 cursor-pointer group"
+                className="card-theme border rounded-xl p-6 transition-all duration-300 cursor-pointer group"
                 onClick={action.action}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -280,19 +278,19 @@ const CustomerService = () => {
                   <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
                     {action.icon}
                   </div>
-                  <h4 className="text-lg font-semibold text-[#E1E6EB] mb-2 group-hover:text-[#00A99D] transition-colors duration-300">
+                  <h4 className="text-lg font-semibold mb-2 text-theme-text group-hover:text-theme-primary transition-colors duration-300">
                     {action.title}
                   </h4>
-                  <p className="text-[#A0AEC0] text-sm">{action.description}</p>
+                  <p className="text-sm text-theme-text-secondary">
+                    {action.description}
+                  </p>
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Service Stats */}
-      <div className="py-12 bg-[#1B212C]">
+      </div>      {/* Service Stats */}
+      <div className="py-12 bg-theme-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="text-center mb-12"
@@ -301,10 +299,10 @@ const CustomerService = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h3 className="text-3xl font-bold text-[#E1E6EB] mb-4">
+            <h3 className="text-3xl font-bold mb-4 text-theme-text">
               Our Commitment to You
             </h3>
-            <p className="text-[#A0AEC0] max-w-2xl mx-auto">
+            <p className="max-w-2xl mx-auto text-theme-text-secondary">
               We're dedicated to providing exceptional support and service to
               all our customers.
             </p>
@@ -318,13 +316,12 @@ const CustomerService = () => {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
+                transition={{ duration: 0.6, delay: index * 0.1 }}              >
                 <div className="text-4xl mb-4">{stat.icon}</div>
-                <div className="text-2xl font-bold text-[#00A99D] mb-2">
+                <div className="text-2xl font-bold mb-2 text-theme-primary">
                   {stat.value}
                 </div>
-                <div className="text-[#A0AEC0]">{stat.label}</div>
+                <div className="text-theme-text-secondary">{stat.label}</div>
               </motion.div>
             ))}
           </div>

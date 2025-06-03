@@ -6,7 +6,7 @@ const HeroSection = ({ onNavigate }) => {
     console.log("Merge Your PDFs Now clicked!");
     // Navigate to the merger tool
     if (onNavigate) {
-      onNavigate('merger');
+      onNavigate("merger");
     }
   };
 
@@ -14,7 +14,7 @@ const HeroSection = ({ onNavigate }) => {
     console.log("Create PDF clicked!");
     // Navigate to the enhanced PDF builder
     if (onNavigate) {
-      onNavigate('builder');
+      onNavigate("builder");
     }
   };
 
@@ -25,13 +25,12 @@ const HeroSection = ({ onNavigate }) => {
       "Demo video would play here, showing how the PDF merge process works."
     );
   };
-
   return (
-    <section className="relative min-h-screen bg-[#1B212C] flex items-center overflow-hidden pt-16 lg:pt-0">
+    <section className="relative min-h-screen flex items-center overflow-hidden pt-16 lg:pt-0 bg-theme-background">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-10 w-48 h-48 sm:w-72 sm:h-72 bg-[#00A99D] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-64 h-64 sm:w-96 sm:h-96 bg-[#00A99D] rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-48 h-48 sm:w-72 sm:h-72 rounded-full blur-3xl bg-theme-primary"></div>
+        <div className="absolute bottom-20 right-10 w-64 h-64 sm:w-96 sm:h-96 rounded-full blur-3xl bg-theme-primary"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -42,36 +41,39 @@ const HeroSection = ({ onNavigate }) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-center lg:text-left"
-          >            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#E1E6EB] leading-tight mb-4 sm:mb-6">
+          >
+            {" "}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 sm:mb-6 text-theme-text">
               The Ultimate PDF Tool.{" "}
-              <span className="text-[#00A99D] block sm:inline">
+              <span className="block sm:inline text-theme-primary">
                 Merge, Build & Design.
               </span>
             </h1>
-            <p className="text-lg sm:text-xl text-[#A0AEC0] mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              Merge PDFs instantly or create stunning documents with our advanced 
-              grid-based layout system. Upload images, arrange them precisely, 
-              and export professional PDFs.
+            <p className="text-lg sm:text-xl mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0 text-theme-text-secondary">
+              Merge PDFs instantly or create stunning documents with our
+              advanced grid-based layout system. Upload images, arrange them
+              precisely, and export professional PDFs.
             </p>{" "}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8 justify-center lg:justify-start">
+              {" "}
               <motion.button
                 onClick={handleMergeClick}
-                className="bg-[#00A99D] hover:bg-[#00A99D]/90 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl order-1"
+                className="btn-primary text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl order-1"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Merge PDFs
               </motion.button>
-
               <motion.button
                 onClick={handleBuilderClick}
-                className="border-2 border-[#00A99D] text-[#00A99D] hover:bg-[#00A99D] hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all duration-300 order-2"
+                className="btn-outline-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold order-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Create PDF
               </motion.button>
-            </div>            <div className="text-xs sm:text-sm text-[#A0AEC0] text-center lg:text-left">
+            </div>{" "}
+            <div className="text-xs sm:text-sm text-center lg:text-left text-theme-text-secondary">
               <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 justify-center lg:justify-start">
                 <span className="flex items-center justify-center lg:justify-start">
                   ✓ Advanced grid layout system
@@ -93,22 +95,22 @@ const HeroSection = ({ onNavigate }) => {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <div className="relative z-10">
-              {/* PDF Merge Visualization */}
-              <div className="bg-[#1B212C]/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 border border-[#A0AEC0]/20">
+              {/* PDF Merge Visualization */}{" "}
+              <div className="backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 border backdrop-blur-theme border-theme-border">
                 <div className="flex items-center justify-center mb-4 sm:mb-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
                     {/* Multiple PDFs */}
                     <div className="flex justify-center space-x-2 sm:space-x-4">
-                      {[1, 2, 3].map((i) => (
-                        <motion.div
+                      {[1, 2, 3].map((i) => (                        <motion.div
                           key={i}
-                          className="w-12 h-16 sm:w-16 sm:h-20 bg-[#E1E6EB] rounded-lg shadow-lg flex items-center justify-center"
+                          className="w-12 h-16 sm:w-16 sm:h-20 rounded-lg shadow-lg flex items-center justify-center bg-theme-secondary border border-theme-border"
                           initial={{ rotate: -10 * i, y: 20 * i }}
                           animate={{ rotate: 0, y: 0 }}
                           transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
                         >
+                          {" "}
                           <svg
-                            className="w-6 h-6 sm:w-8 sm:h-8 text-[#1B212C]"
+                            className="w-6 h-6 sm:w-8 sm:h-8 text-theme-primary"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -129,11 +131,12 @@ const HeroSection = ({ onNavigate }) => {
                       animate={{ scale: 1 }}
                       transition={{ delay: 1.2, duration: 0.3 }}
                     >
-                      <svg
-                        className="w-6 h-6 sm:w-8 sm:h-8 text-[#00A99D] rotate-90 sm:rotate-0"
+                      {" "}                      <svg
+                        className="w-6 h-6 sm:w-8 sm:h-8 rotate-90 sm:rotate-0 text-theme-primary"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
+                        strokeWidth="3"
                       >
                         <path
                           strokeLinecap="round"
@@ -146,8 +149,9 @@ const HeroSection = ({ onNavigate }) => {
 
                     {/* Merged PDF */}
                     <div className="flex justify-center">
+                      {" "}
                       <motion.div
-                        className="w-16 h-20 sm:w-20 sm:h-24 bg-[#00A99D] rounded-lg shadow-xl flex items-center justify-center"
+                        className="w-16 h-20 sm:w-20 sm:h-24 rounded-lg shadow-xl flex items-center justify-center bg-theme-primary"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 1.5, duration: 0.5 }}
@@ -166,27 +170,24 @@ const HeroSection = ({ onNavigate }) => {
                       </motion.div>
                     </div>
                   </div>
-                </div>
-
+                </div>{" "}
                 <div className="text-center">
-                  <p className="text-[#E1E6EB] font-semibold text-sm sm:text-base">
+                  <p className="font-semibold text-sm sm:text-base text-theme-text">
                     Multiple PDFs
                   </p>
-                  <p className="text-[#A0AEC0] text-xs sm:text-sm mt-1">
+                  <p className="text-xs sm:text-sm mt-1 text-theme-text-secondary">
                     Seamlessly combined in seconds
                   </p>
                 </div>
               </div>
             </div>
-
-            {/* Floating elements */}
-            <motion.div
-              className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-12 h-12 sm:w-16 sm:h-16 bg-[#00A99D]/20 rounded-full flex items-center justify-center"
+            {/* Floating elements */}{" "}            <motion.div
+              className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center bg-theme-primary-opaque-60"
               animate={{ y: [-10, 10, -10] }}
               transition={{ repeat: Infinity, duration: 3 }}
             >
               <svg
-                className="w-6 h-6 sm:w-8 sm:h-8 text-[#00A99D]"
+                className="w-6 h-6 sm:w-8 sm:h-8 text-white"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -196,15 +197,13 @@ const HeroSection = ({ onNavigate }) => {
                   clipRule="evenodd"
                 />
               </svg>
-            </motion.div>
-
-            <motion.div
-              className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 w-10 h-10 sm:w-12 sm:h-12 bg-[#00A99D]/30 rounded-lg flex items-center justify-center"
+            </motion.div>{" "}            <motion.div
+              className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center bg-theme-primary-opaque-70"
               animate={{ x: [-5, 5, -5] }}
               transition={{ repeat: Infinity, duration: 2 }}
             >
               <svg
-                className="w-4 h-4 sm:w-6 sm:h-6 text-[#00A99D]"
+                className="w-4 h-4 sm:w-6 sm:h-6 text-white"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -226,12 +225,13 @@ const HeroSection = ({ onNavigate }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2, duration: 0.6 }}
       >
-        <div className="bg-[#1B212C]/80 backdrop-blur-sm rounded-full px-6 py-3 border border-[#A0AEC0]/20">
-          <p className="text-[#A0AEC0] text-sm text-center">
-            <span className="text-[#00A99D] font-semibold">1M+</span> Files
+        {" "}
+        <div className="backdrop-blur-sm rounded-full px-6 py-3 border bg-theme-primary-opaque-80 border-theme-border">
+          <p className="text-sm text-center text-theme-text-secondary">
+            <span className="font-semibold text-theme-primary">1M+</span> Files
             Merged Securely •
-            <span className="text-[#00A99D] font-semibold"> 4.9/5</span> User
-            Rating
+            <span className="font-semibold text-theme-primary"> 4.9/5</span>{" "}
+            User Rating
           </p>
         </div>
       </motion.div>

@@ -589,9 +589,8 @@ const SecurityFeatures = ({ onNavigate }) => {
         );
 
       case 'audit':
-        return (
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-[#E1E6EB]">Audit Settings</h4>
+        return (            <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-theme-text">Audit Settings</h4>
             
             <div className="space-y-3">
               {[
@@ -601,14 +600,13 @@ const SecurityFeatures = ({ onNavigate }) => {
                 'Track modification attempts',
                 'Record user information',
                 'Log IP addresses'
-              ].map((setting, index) => (
-                <label key={index} className="flex items-center gap-3 cursor-pointer">
+              ].map((setting, index) => (                <label key={index} className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     defaultChecked={true}
-                    className="w-4 h-4 text-[#00A99D] bg-[#1B212C] border-[#A0AEC0]/20 rounded focus:ring-[#00A99D]"
+                    className="w-4 h-4 text-theme-primary bg-theme-background border-theme-border rounded focus:ring-theme-primary"
                   />
-                  <span className="text-[#E1E6EB]">{setting}</span>
+                  <span className="text-theme-text">{setting}</span>
                 </label>
               ))}
             </div>
@@ -619,10 +617,9 @@ const SecurityFeatures = ({ onNavigate }) => {
         return null;
     }
   };
-
   return (
-    <div className="min-h-screen bg-[#1B212C] py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">        {/* Header */}
+    <div className="min-h-screen bg-theme-background py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">{/* Header */}
         <motion.div
           className="mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -631,9 +628,8 @@ const SecurityFeatures = ({ onNavigate }) => {
         >
           <div className="flex items-center justify-between mb-6">
             {onNavigate && (
-              <button
-                onClick={handleBackClick}
-                className="flex items-center gap-2 px-4 py-2 bg-[#151B24] border border-[#A0AEC0]/20 rounded-lg text-[#A0AEC0] hover:text-[#00A99D] hover:border-[#00A99D]/50 transition-all duration-200"
+              <button                onClick={handleBackClick}
+                className="flex items-center gap-2 px-4 py-2 card-theme text-theme-text-secondary hover:text-theme-primary hover:border-theme-primary transition-all duration-200"
               >
                 <svg
                   className="w-4 h-4"
@@ -677,11 +673,10 @@ const SecurityFeatures = ({ onNavigate }) => {
             
             return (
               <motion.div
-                key={feature.id}
-                className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${
+                key={feature.id}                className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${
                   isSelected
                     ? `${feature.bgColor} ${feature.borderColor} border-2`
-                    : 'bg-[#151B24] border-[#A0AEC0]/20 hover:border-[#00A99D]/50'
+                    : 'card-theme hover:border-theme-primary'
                 }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -690,15 +685,14 @@ const SecurityFeatures = ({ onNavigate }) => {
                 <div className="text-center">
                   <div className={`inline-flex p-3 rounded-xl ${feature.bgColor} ${feature.borderColor} border mb-4`}>
                     <Icon className={`w-8 h-8 ${feature.color}`} />
-                  </div>
-                  <h3 className="text-lg font-semibold text-[#E1E6EB] mb-2">
+                  </div>                  <h3 className="text-lg font-semibold text-theme-text mb-2">
                     {feature.name}
                   </h3>
-                  <p className="text-[#A0AEC0] text-sm">{feature.description}</p>
+                  <p className="text-theme-text-secondary text-sm">{feature.description}</p>
                   
                   {isSelected && (
                     <motion.div
-                      className="mt-3 flex items-center justify-center gap-2 text-[#00A99D] text-sm"
+                      className="mt-3 flex items-center justify-center gap-2 text-theme-primary text-sm"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                     >
@@ -713,31 +707,28 @@ const SecurityFeatures = ({ onNavigate }) => {
         </motion.div>
 
         {/* File Upload Section */}
-        {selectedFeature && (
-          <motion.div
-            className="bg-[#151B24] rounded-2xl border border-[#A0AEC0]/20 p-6 mb-8"
+        {selectedFeature && (          <motion.div
+            className="card-theme p-6 mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h3 className="text-xl font-semibold text-[#E1E6EB] mb-4">
+            <h3 className="text-xl font-semibold text-theme-text mb-4">
               Upload PDF Files for Security Processing
             </h3>
             
             <div
-              {...getRootProps()}
-              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer ${
+              {...getRootProps()}              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer ${
                 isDragActive
-                  ? 'border-[#00A99D] bg-[#00A99D]/5'
-                  : 'border-[#A0AEC0]/30 hover:border-[#00A99D]/50'
+                  ? 'border-theme-primary bg-theme-primary-opaque-10'
+                  : 'border-theme-border hover:border-theme-primary'
               }`}
             >
-              <input {...getInputProps()} />
-              <Shield className="w-12 h-12 text-[#00A99D] mx-auto mb-3" />
-              <h4 className="text-lg font-semibold text-[#E1E6EB] mb-2">
+              <input {...getInputProps()} />              <Shield className="w-12 h-12 text-theme-primary mx-auto mb-3" />
+              <h4 className="text-lg font-semibold text-theme-text mb-2">
                 {isDragActive ? 'Drop PDF files here' : 'Upload PDF Files'}
               </h4>
-              <p className="text-[#A0AEC0]">
+              <p className="text-theme-text-secondary">
                 Drag & drop PDF files or click to browse
               </p>
             </div>
@@ -769,11 +760,10 @@ const SecurityFeatures = ({ onNavigate }) => {
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-2">
-                        <button
+                      <div className="flex items-center gap-2">                        <button
                           onClick={() => applySecurityFeature(file.id)}
                           disabled={isProcessing}
-                          className="px-4 py-2 bg-[#00A99D] hover:bg-[#00A99D]/90 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                          className="btn-primary px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
                           {isProcessing ? (
                             <Loader className="w-4 h-4 animate-spin" />
@@ -889,24 +879,23 @@ const SecurityFeatures = ({ onNavigate }) => {
         )}
 
         {/* Audit Log */}
-        {auditLog.length > 0 && (
-          <motion.div
-            className="bg-[#151B24] rounded-2xl border border-[#A0AEC0]/20 p-6"
+        {auditLog.length > 0 && (            <motion.div
+            className="card-theme p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <Clock className="w-6 h-6 text-[#00A99D]" />
-                <h3 className="text-xl font-semibold text-[#E1E6EB]">
+                <Clock className="w-6 h-6 text-theme-primary" />
+                <h3 className="text-xl font-semibold text-theme-text">
                   Security Audit Log
                 </h3>
               </div>
               
               <button
                 onClick={() => setAuditLog([])}
-                className="px-3 py-2 text-[#A0AEC0] hover:text-red-400 transition-colors"
+                className="px-3 py-2 text-theme-text-secondary hover:text-red-400 transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
