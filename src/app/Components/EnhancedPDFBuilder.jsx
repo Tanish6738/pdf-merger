@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useDropzone } from 'react-dropzone';
+import React, { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useDropzone } from "react-dropzone";
 import {
   Upload,
   Download,
@@ -10,10 +10,10 @@ import {
   Plus,
   X,
   AlertTriangle,
-  FileText
-} from 'lucide-react';
+  FileText,
+} from "lucide-react";
 
-import LoadingSpinner from './LoadingSpinner';
+import LoadingSpinner from "./LoadingSpinner";
 
 const EnhancePDFBuilder = () => {
   // Core state
@@ -26,75 +26,93 @@ const EnhancePDFBuilder = () => {
 
   // Image upload functionality
   const onDrop = useCallback((acceptedFiles) => {
-    const newImages = acceptedFiles.map(file => ({
+    const newImages = acceptedFiles.map((file) => ({
       id: Date.now() + Math.random(),
       file,
       name: file.name,
       size: file.size,
       url: URL.createObjectURL(file),
-      addedAt: new Date().toISOString()
+      addedAt: new Date().toISOString(),
     }));
-    
-    setImages(prev => [...prev, ...newImages]);
+
+    setImages((prev) => [...prev, ...newImages]);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp']
+      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"],
     },
-    multiple: true
+    multiple: true,
   });
 
   // Image management
   const removeImage = useCallback((imageId) => {
-    setImages(prev => prev.filter(img => img.id !== imageId));
+    setImages((prev) => prev.filter((img) => img.id !== imageId));
     // Remove from all pages
-    setPages(prev => prev.map(page => ({
-      ...page,
-      images: page.images.filter(img => img.id !== imageId)
-    })));
+    setPages((prev) =>
+      prev.map((page) => ({
+        ...page,
+        images: page.images.filter((img) => img.id !== imageId),
+      }))
+    );
   }, []);
 
-  const addImageToPage = useCallback((imageId) => {
-    const image = images.find(img => img.id === imageId);
-    if (!image) return;
+  const addImageToPage = useCallback(
+    (imageId) => {
+      const image = images.find((img) => img.id === imageId);
+      if (!image) return;
 
-    setPages(prev => prev.map(page => 
-      page.id === currentPage
-        ? { ...page, images: [...page.images, { id: imageId, ...image }] }
-        : page
-    ));
-  }, [images, currentPage]);
+      setPages((prev) =>
+        prev.map((page) =>
+          page.id === currentPage
+            ? { ...page, images: [...page.images, { id: imageId, ...image }] }
+            : page
+        )
+      );
+    },
+    [images, currentPage]
+  );
 
-  const removeImageFromPage = useCallback((imageId) => {
-    setPages(prev => prev.map(page => 
-      page.id === currentPage
-        ? { ...page, images: page.images.filter(img => img.id !== imageId) }
-        : page
-    ));
-  }, [currentPage]);
+  const removeImageFromPage = useCallback(
+    (imageId) => {
+      setPages((prev) =>
+        prev.map((page) =>
+          page.id === currentPage
+            ? {
+                ...page,
+                images: page.images.filter((img) => img.id !== imageId),
+              }
+            : page
+        )
+      );
+    },
+    [currentPage]
+  );
 
   // Page management
   const addPage = useCallback(() => {
     const newPage = {
       id: Date.now(),
-      images: []
+      images: [],
     };
-    setPages(prev => [...prev, newPage]);
+    setPages((prev) => [...prev, newPage]);
     setCurrentPage(newPage.id);
   }, []);
 
-  const deletePage = useCallback((pageId) => {
-    if (pages.length <= 1) return;
-    
-    const newPages = pages.filter(p => p.id !== pageId);
-    setPages(newPages);
-    
-    if (currentPage === pageId) {
-      setCurrentPage(newPages[0].id);
-    }
-  }, [pages, currentPage]);
+  const deletePage = useCallback(
+    (pageId) => {
+      if (pages.length <= 1) return;
+
+      const newPages = pages.filter((p) => p.id !== pageId);
+      setPages(newPages);
+
+      if (currentPage === pageId) {
+        setCurrentPage(newPages[0].id);
+      }
+    },
+    [pages, currentPage]
+  );
   // Export to PDF
   const exportToPDF = async () => {
     setIsProcessing(true);
@@ -103,55 +121,57 @@ const EnhancePDFBuilder = () => {
 
     try {
       // Check if there are any pages with images
-      const pagesWithImages = pages.filter(page => page.images.length > 0);
+      const pagesWithImages = pages.filter((page) => page.images.length > 0);
       if (pagesWithImages.length === 0) {
-        throw new Error('Please add at least one image to export');
+        throw new Error("Please add at least one image to export");
       }
 
       setProgress(20);
 
       // Create PDF using pdf-lib
-      const { PDFDocument, rgb } = await import('pdf-lib');
+      const { PDFDocument, rgb } = await import("pdf-lib");
       const pdfDoc = await PDFDocument.create();
-      
+
       setProgress(40);
 
       for (let i = 0; i < pagesWithImages.length; i++) {
         const pageData = pagesWithImages[i];
-        
+
         // Add a new page
         const page = pdfDoc.addPage();
         const { width: pageWidth, height: pageHeight } = page.getSize();
-        
+
         setProgress(40 + (i / pagesWithImages.length) * 40);
 
         // Calculate layout for images
         const margin = 50;
-        const availableWidth = pageWidth - (margin * 2);
-        const availableHeight = pageHeight - (margin * 2);
+        const availableWidth = pageWidth - margin * 2;
+        const availableHeight = pageHeight - margin * 2;
         const imageHeight = availableHeight / pageData.images.length;
 
         // Add images to page
         for (let j = 0; j < pageData.images.length; j++) {
           const image = pageData.images[j];
-          
+
           // Convert image to bytes
-          const imageBytes = await fetch(image.url).then(res => res.arrayBuffer());
-          
+          const imageBytes = await fetch(image.url).then((res) =>
+            res.arrayBuffer()
+          );
+
           // Determine image type and embed accordingly
           let embeddedImage;
           const imageType = image.file.type.toLowerCase();
-          
-          if (imageType.includes('png')) {
+
+          if (imageType.includes("png")) {
             embeddedImage = await pdfDoc.embedPng(imageBytes);
-          } else if (imageType.includes('jpg') || imageType.includes('jpeg')) {
+          } else if (imageType.includes("jpg") || imageType.includes("jpeg")) {
             embeddedImage = await pdfDoc.embedJpg(imageBytes);
           } else {
             // Convert other formats to PNG using canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
             const img = new Image();
-            
+
             const pngBytes = await new Promise((resolve) => {
               img.onload = () => {
                 canvas.width = img.width;
@@ -160,29 +180,33 @@ const EnhancePDFBuilder = () => {
                 canvas.toBlob(async (blob) => {
                   const arrayBuffer = await blob.arrayBuffer();
                   resolve(arrayBuffer);
-                }, 'image/png');
+                }, "image/png");
               };
               img.src = image.url;
             });
-            
+
             embeddedImage = await pdfDoc.embedPng(pngBytes);
           }
 
           // Calculate image dimensions maintaining aspect ratio
           const { width: imgWidth, height: imgHeight } = embeddedImage.scale(1);
           const aspectRatio = imgWidth / imgHeight;
-          
+
           let drawWidth = availableWidth;
           let drawHeight = drawWidth / aspectRatio;
-          
+
           if (drawHeight > imageHeight - 20) {
             drawHeight = imageHeight - 20;
             drawWidth = drawHeight * aspectRatio;
           }
-          
+
           const x = margin + (availableWidth - drawWidth) / 2;
-          const y = pageHeight - margin - (j + 1) * imageHeight + (imageHeight - drawHeight) / 2;
-          
+          const y =
+            pageHeight -
+            margin -
+            (j + 1) * imageHeight +
+            (imageHeight - drawHeight) / 2;
+
           // Draw the image
           page.drawImage(embeddedImage, {
             x,
@@ -197,13 +221,16 @@ const EnhancePDFBuilder = () => {
 
       // Generate PDF bytes and download
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
-      
-      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+
+      const timestamp = new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace(/:/g, "-");
       const filename = `pdf-builder-${timestamp}.pdf`;
-      
-      const link = document.createElement('a');
+
+      const link = document.createElement("a");
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
@@ -212,28 +239,28 @@ const EnhancePDFBuilder = () => {
       URL.revokeObjectURL(url);
 
       setProgress(100);
-      
+
       setTimeout(() => {
         setIsProcessing(false);
         setProgress(0);
       }, 1000);
-
     } catch (error) {
-      console.error('Export Error:', error);
-      setError('Failed to export PDF: ' + error.message);
+      console.error("Export Error:", error);
+      setError("Failed to export PDF: " + error.message);
       setIsProcessing(false);
       setProgress(0);
     }
   };
 
-  const getCurrentPage = () => pages.find(p => p.id === currentPage) || pages[0];
+  const getCurrentPage = () =>
+    pages.find((p) => p.id === currentPage) || pages[0];
 
   const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
+    const sizes = ["Bytes", "KB", "MB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   return (
@@ -242,14 +269,18 @@ const EnhancePDFBuilder = () => {
       <header className="bg-[#1a1f2e] border-b border-gray-700 p-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-[#00A99D]">Simple PDF Builder</h1>
+            <h1 className="text-2xl font-bold text-[#00A99D]">
+              Simple PDF Builder
+            </h1>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Export Button */}
             <button
               onClick={exportToPDF}
-              disabled={isProcessing || pages.every(p => p.images.length === 0)}
+              disabled={
+                isProcessing || pages.every((p) => p.images.length === 0)
+              }
               className="px-4 py-2 bg-[#00A99D] hover:bg-[#008a7d] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg flex items-center gap-2"
             >
               {isProcessing ? (
@@ -273,22 +304,22 @@ const EnhancePDFBuilder = () => {
                 <ImageIcon size={20} />
                 Image Library
               </h2>
-              
+
               {/* Upload Area */}
               <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
                   isDragActive
-                    ? 'border-[#00A99D] bg-[#00A99D]/10'
-                    : 'border-gray-600 hover:border-gray-500'
+                    ? "border-[#00A99D] bg-[#00A99D]/10"
+                    : "border-gray-600 hover:border-gray-500"
                 }`}
               >
                 <input {...getInputProps()} />
                 <Upload className="mx-auto mb-4 text-gray-400" size={32} />
                 <p className="text-gray-300">
                   {isDragActive
-                    ? 'Drop images here...'
-                    : 'Drag & drop images or click to browse'}
+                    ? "Drop images here..."
+                    : "Drag & drop images or click to browse"}
                 </p>
                 <p className="text-sm text-gray-500 mt-2">
                   Supports PNG, JPG, JPEG, GIF, BMP, WebP
@@ -308,8 +339,12 @@ const EnhancePDFBuilder = () => {
                       className="w-12 h-12 object-cover rounded"
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{image.name}</p>
-                      <p className="text-xs text-gray-400">{formatFileSize(image.size)}</p>
+                      <p className="text-sm font-medium truncate">
+                        {image.name}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {formatFileSize(image.size)}
+                      </p>
                     </div>
                     <div className="flex gap-1">
                       <button
@@ -351,18 +386,15 @@ const EnhancePDFBuilder = () => {
                     Add Page
                   </button>
                 </div>
-                  <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2 flex-wrap">
                   {pages.map((page, index) => (
-                    <div
-                      key={page.id}
-                      className="relative"
-                    >
+                    <div key={page.id} className="relative">
                       <button
                         onClick={() => setCurrentPage(page.id)}
                         className={`relative px-4 py-2 rounded-lg transition-colors ${
                           currentPage === page.id
-                            ? 'bg-[#00A99D] text-white'
-                            : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                            ? "bg-[#00A99D] text-white"
+                            : "bg-gray-700 hover:bg-gray-600 text-gray-300"
                         }`}
                       >
                         Page {index + 1}
@@ -383,13 +415,13 @@ const EnhancePDFBuilder = () => {
                     </div>
                   ))}
                 </div>
-              </div>
-
+              </div>{" "}
               {/* Current Page Content */}
               <div className="bg-[#1a1f2e] rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">
-                    Page {pages.findIndex(p => p.id === currentPage) + 1} Content
+                    Page {pages.findIndex((p) => p.id === currentPage) + 1}{" "}
+                    Content
                   </h3>
                   <span className="text-sm text-gray-400">
                     {getCurrentPage().images.length} images
@@ -400,7 +432,9 @@ const EnhancePDFBuilder = () => {
                   <div className="text-center py-12 text-gray-500">
                     <ImageIcon size={48} className="mx-auto mb-4 opacity-50" />
                     <p>No images on this page</p>
-                    <p className="text-sm mt-2">Add images from the library on the left</p>
+                    <p className="text-sm mt-2">
+                      Add images from the library on the left
+                    </p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -424,10 +458,73 @@ const EnhancePDFBuilder = () => {
                           </button>
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 p-2">
-                          <p className="text-xs text-white truncate">{image.name}</p>
+                          <p className="text-xs text-white truncate">
+                            {image.name}
+                          </p>
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+              {/* PDF Preview Section */}
+              <div className="bg-[#1a1f2e] rounded-lg p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <FileText size={20} />
+                    PDF Preview
+                  </h3>
+                  <span className="text-sm text-gray-400">
+                    How it will look in PDF
+                  </span>
+                </div>
+
+                {getCurrentPage().images.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <FileText size={48} className="mx-auto mb-4 opacity-50" />
+                    <p>No preview available</p>
+                    <p className="text-sm mt-2">
+                      Add images to see PDF layout preview
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-lg p-4 shadow-inner">
+                    {/* PDF Page Preview */}
+                    <div
+                      className="bg-white border border-gray-300 rounded mx-auto"
+                      style={{
+                        width: "300px",
+                        height: "400px",
+                        aspectRatio: "210/297",
+                      }}
+                    >
+                      <div className="h-full p-4 flex flex-col justify-start gap-2">
+                        {getCurrentPage().images.map((image, index) => {
+                          const imageHeight =
+                            (400 - 32) / getCurrentPage().images.length; // Total height minus padding, divided by number of images
+                          return (
+                            <div
+                              key={`preview-${image.id}-${index}`}
+                              className="bg-gray-100 border border-gray-200 rounded flex items-center justify-center relative overflow-hidden"
+                              style={{ height: `${imageHeight - 8}px` }}
+                            >
+                              <img
+                                src={image.url}
+                                alt={image.name}
+                                className="max-w-full max-h-full object-contain"
+                              />
+                              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 truncate">
+                                {image.name}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="text-center mt-3 text-gray-600 text-sm">
+                      Page {pages.findIndex((p) => p.id === currentPage) + 1}{" "}
+                      Preview
+                    </div>
                   </div>
                 )}
               </div>
@@ -481,7 +578,9 @@ const EnhancePDFBuilder = () => {
                     style={{ width: `${progress}%` }}
                   />
                 </div>
-                <p className="text-sm text-gray-400 mt-2">{progress}% complete</p>
+                <p className="text-sm text-gray-400 mt-2">
+                  {progress}% complete
+                </p>
               </div>
             </div>
           </motion.div>
