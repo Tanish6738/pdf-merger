@@ -24,28 +24,37 @@ import {
 
 import LoadingSpinner from "./LoadingSpinner";
 
-const EnhancePDFBuilder = () => {  // Core state
+const EnhancePDFBuilder = ({ onNavigate }) => {
+  // Core state
   const [images, setImages] = useState([]);
   const [pages, setPages] = useState([{ id: 1, images: [] }]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
-  
+
   // PDF settings
-  const [pdfOrientation, setPdfOrientation] = useState('portrait'); // 'portrait' or 'landscape'
+  const [pdfOrientation, setPdfOrientation] = useState("portrait"); // 'portrait' or 'landscape'
   const [pdfSettings, setPdfSettings] = useState({
     margins: { top: 50, bottom: 50, left: 50, right: 50 },
     padding: { top: 10, bottom: 10, left: 10, right: 10 },
-    imageFitMode: 'fit', // 'fit', 'cover', 'stretch'
+    imageFitMode: "fit", // 'fit', 'cover', 'stretch'
+    imageSpacing: 10, // Space between images in pixels
+    textSettings: {
+      enabled: false,
+      fontSize: 12,
+      color: "#000000",
+      position: "below", // 'below', 'above'
+      alignment: "center", // 'left', 'center', 'right'
+    },
     watermark: {
       enabled: false,
-      text: '',
+      text: "",
       opacity: 0.3,
       fontSize: 24,
-      color: '#cccccc',
-      position: 'center' // 'center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'
-    }
+      color: "#cccccc",
+      position: "center", // 'center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'
+    },
   });
   const [showSettings, setShowSettings] = useState(false);
   // Image upload functionality
@@ -58,6 +67,7 @@ const EnhancePDFBuilder = () => {  // Core state
       url: URL.createObjectURL(file),
       addedAt: new Date().toISOString(),
       rotation: 0, // Add rotation property (0, 90, 180, 270 degrees)
+      caption: "", // Add caption property for text below images
     }));
 
     setImages((prev) => [...prev, ...newImages]);
@@ -97,6 +107,26 @@ const EnhancePDFBuilder = () => {  // Core state
     },
     [images, currentPage]
   );
+
+  // Add function to update image caption
+  const updateImageCaption = useCallback((imageId, caption) => {
+    // Update in main images array
+    setImages((prev) =>
+      prev.map((img) =>
+        img.id === imageId ? { ...img, caption } : img
+      )
+    );
+
+    // Update in all pages that contain this image
+    setPages((prev) =>
+      prev.map((page) => ({
+        ...page,
+        images: page.images.map((img) =>
+          img.id === imageId ? { ...img, caption } : img
+        ),
+      }))
+    );
+  }, []);
 
   const removeImageFromPage = useCallback(
     (imageId) => {
@@ -140,28 +170,43 @@ const EnhancePDFBuilder = () => {  // Core state
   const updatePdfSettings = useCallback((newSettings) => {
     setPdfSettings((prev) => ({
       ...prev,
-      ...newSettings
+      ...newSettings,
     }));
   }, []);
 
   const updateMargins = useCallback((margins) => {
     setPdfSettings((prev) => ({
       ...prev,
-      margins: { ...prev.margins, ...margins }
+      margins: { ...prev.margins, ...margins },
     }));
   }, []);
 
   const updatePadding = useCallback((padding) => {
     setPdfSettings((prev) => ({
       ...prev,
-      padding: { ...prev.padding, ...padding }
+      padding: { ...prev.padding, ...padding },
     }));
   }, []);
 
   const updateWatermark = useCallback((watermark) => {
     setPdfSettings((prev) => ({
       ...prev,
-      watermark: { ...prev.watermark, ...watermark }
+      watermark: { ...prev.watermark, ...watermark },
+    }));
+  }, []);
+
+  // Add functions for new settings
+  const updateTextSettings = useCallback((textSettings) => {
+    setPdfSettings((prev) => ({
+      ...prev,
+      textSettings: { ...prev.textSettings, ...textSettings },
+    }));
+  }, []);
+
+  const updateImageSpacing = useCallback((spacing) => {
+    setPdfSettings((prev) => ({
+      ...prev,
+      imageSpacing: spacing,
     }));
   }, []);
 
@@ -187,7 +232,7 @@ const EnhancePDFBuilder = () => {  // Core state
       }
     },
     [pages, currentPage]
-  );  // Export to PDF
+  ); // Export to PDF
   const exportToPDF = async () => {
     setIsProcessing(true);
     setProgress(0);
@@ -212,19 +257,32 @@ const EnhancePDFBuilder = () => {  // Core state
         const pageData = pagesWithImages[i];
 
         // Add a new page with orientation
-        const page = pdfOrientation === 'landscape' 
-          ? pdfDoc.addPage([842, 595]) // A4 landscape
-          : pdfDoc.addPage([595, 842]); // A4 portrait
-        
+        const page =
+          pdfOrientation === "landscape"
+            ? pdfDoc.addPage([842, 595]) // A4 landscape
+            : pdfDoc.addPage([595, 842]); // A4 portrait
+
         const { width: pageWidth, height: pageHeight } = page.getSize();
 
         setProgress(40 + (i / pagesWithImages.length) * 40);        // Apply settings from state
-        const { margins, padding, imageFitMode, watermark } = pdfSettings;
-        
-        // Calculate layout for images
+        const { margins, padding, imageFitMode, watermark, imageSpacing, textSettings } = pdfSettings;
+
+        // Calculate layout for images including text captions and spacing
         const availableWidth = pageWidth - margins.left - margins.right;
         const availableHeight = pageHeight - margins.top - margins.bottom;
-        const imageHeight = availableHeight / pageData.images.length;
+        
+        // Calculate spacing between images
+        const totalSpacing = (pageData.images.length - 1) * imageSpacing;
+        
+        // Calculate space needed for text captions if enabled
+        let textHeight = 0;
+        if (textSettings.enabled) {
+          textHeight = textSettings.fontSize + 10; // Font size + some padding
+        }
+        
+        // Calculate available height per image (including text if enabled)
+        const imageContainerHeight = (availableHeight - totalSpacing) / pageData.images.length;
+        const imageHeight = imageContainerHeight - textHeight;
 
         // Add images to page
         for (let j = 0; j < pageData.images.length; j++) {
@@ -263,14 +321,14 @@ const EnhancePDFBuilder = () => {  // Core state
             });
 
             embeddedImage = await pdfDoc.embedPng(pngBytes);
-          }          // Calculate image dimensions based on fit mode
+          } // Calculate image dimensions based on fit mode
           let { width: imgWidth, height: imgHeight } = embeddedImage.scale(1);
-          
+
           // Adjust dimensions for rotation (90 or 270 degrees swap width/height)
           if (image.rotation === 90 || image.rotation === 270) {
             [imgWidth, imgHeight] = [imgHeight, imgWidth];
           }
-          
+
           const aspectRatio = imgWidth / imgHeight;
           const containerWidth = availableWidth - padding.left - padding.right;
           const containerHeight = imageHeight - padding.top - padding.bottom;
@@ -278,11 +336,11 @@ const EnhancePDFBuilder = () => {  // Core state
           let drawWidth, drawHeight;
 
           switch (imageFitMode) {
-            case 'stretch':
+            case "stretch":
               drawWidth = containerWidth;
               drawHeight = containerHeight;
               break;
-            case 'cover':
+            case "cover":
               const scale = Math.max(
                 containerWidth / imgWidth,
                 containerHeight / imgHeight
@@ -293,26 +351,30 @@ const EnhancePDFBuilder = () => {  // Core state
               if (drawWidth > containerWidth) drawWidth = containerWidth;
               if (drawHeight > containerHeight) drawHeight = containerHeight;
               break;
-            case 'fit':
+            case "fit":
             default:
               drawWidth = containerWidth;
               drawHeight = drawWidth / aspectRatio;
-              
+
               if (drawHeight > containerHeight) {
                 drawHeight = containerHeight;
                 drawWidth = drawHeight * aspectRatio;
               }
               break;
-          }
-
-          const x = margins.left + padding.left + (containerWidth - drawWidth) / 2;
-          const y = pageHeight - margins.top - (j + 1) * imageHeight + 
-                   padding.bottom + (containerHeight - drawHeight) / 2;// Draw the image with rotation
+          }          const x =
+            margins.left + padding.left + (containerWidth - drawWidth) / 2;
+          const y =
+            pageHeight -
+            margins.top -
+            j * (imageContainerHeight + imageSpacing) -
+            imageHeight +
+            padding.bottom +
+            (imageHeight - drawHeight) / 2;          // Draw the image with rotation
           if (image.rotation && image.rotation !== 0) {
             // Calculate center point for rotation
             const centerX = x + drawWidth / 2;
             const centerY = y + drawHeight / 2;
-            
+
             // Apply rotation around center
             page.drawImage(embeddedImage, {
               x: centerX - drawWidth / 2,
@@ -327,13 +389,57 @@ const EnhancePDFBuilder = () => {  // Core state
               x,
               y,
               width: drawWidth,
-              height: drawHeight,            });
+              height: drawHeight,
+            });
+          }
+
+          // Add image caption if enabled and caption exists
+          if (textSettings.enabled && image.caption && image.caption.trim()) {
+            const helvetica = await pdfDoc.embedFont("Helvetica");
+            const captionColor = rgb(
+              parseInt(textSettings.color.slice(1, 3), 16) / 255,
+              parseInt(textSettings.color.slice(3, 5), 16) / 255,
+              parseInt(textSettings.color.slice(5, 7), 16) / 255
+            );
+
+            const captionWidth = helvetica.widthOfTextAtSize(
+              image.caption,
+              textSettings.fontSize
+            );
+
+            let captionX;
+            switch (textSettings.alignment) {
+              case "left":
+                captionX = x;
+                break;
+              case "right":
+                captionX = x + drawWidth - captionWidth;
+                break;
+              case "center":
+              default:
+                captionX = x + (drawWidth - captionWidth) / 2;
+                break;
+            }            // Position caption based on setting
+            let captionY;
+            if (textSettings.position === "above") {
+              captionY = y + drawHeight + textSettings.fontSize + 5; // Above the image
+            } else {
+              captionY = y - 15; // Below the image (default)
+            }
+
+            page.drawText(image.caption, {
+              x: captionX,
+              y: captionY,
+              size: textSettings.fontSize,
+              font: helvetica,
+              color: captionColor,
+            });
           }
         }
 
         // Add watermark if enabled
         if (watermark.enabled && watermark.text) {
-          const helvetica = await pdfDoc.embedFont('Helvetica');
+          const helvetica = await pdfDoc.embedFont("Helvetica");
           const textColor = rgb(
             parseInt(watermark.color.slice(1, 3), 16) / 255,
             parseInt(watermark.color.slice(3, 5), 16) / 255,
@@ -341,27 +447,30 @@ const EnhancePDFBuilder = () => {  // Core state
           );
 
           let textX, textY;
-          const textWidth = helvetica.widthOfTextAtSize(watermark.text, watermark.fontSize);
+          const textWidth = helvetica.widthOfTextAtSize(
+            watermark.text,
+            watermark.fontSize
+          );
           const textHeight = watermark.fontSize;
 
           switch (watermark.position) {
-            case 'top-left':
+            case "top-left":
               textX = margins.left;
               textY = pageHeight - margins.top - textHeight;
               break;
-            case 'top-right':
+            case "top-right":
               textX = pageWidth - margins.right - textWidth;
               textY = pageHeight - margins.top - textHeight;
               break;
-            case 'bottom-left':
+            case "bottom-left":
               textX = margins.left;
               textY = margins.bottom;
               break;
-            case 'bottom-right':
+            case "bottom-right":
               textX = pageWidth - margins.right - textWidth;
               textY = margins.bottom;
               break;
-            case 'center':
+            case "center":
             default:
               textX = (pageWidth - textWidth) / 2;
               textY = (pageHeight - textHeight) / 2;
@@ -433,47 +542,48 @@ const EnhancePDFBuilder = () => {  // Core state
             <h1 className="text-2xl font-bold text-theme-primary">
               Simple PDF Builder
             </h1>
-          </div>          <div className="flex items-center gap-3">
+          </div>{" "}
+          <div className="flex items-center gap-3">
             {/* PDF Settings Button */}
             <button
               onClick={() => setShowSettings(!showSettings)}
               className={`p-2 rounded transition-colors ${
                 showSettings
-                  ? 'bg-theme-primary text-white'
-                  : 'text-theme-text hover:bg-theme-primary-opaque-20'
+                  ? "bg-theme-primary text-white"
+                  : "text-theme-text hover:bg-theme-primary-opaque-20"
               }`}
               title="PDF Settings"
             >
               <Settings size={16} />
             </button>
-            
+
             {/* PDF Orientation Controls */}
             <div className="flex items-center gap-2 bg-theme-background rounded-lg p-2 border border-theme-border">
               <span className="text-sm text-theme-text-secondary">PDF:</span>
               <button
-                onClick={() => setPdfOrientation('portrait')}
+                onClick={() => setPdfOrientation("portrait")}
                 className={`p-2 rounded transition-colors ${
-                  pdfOrientation === 'portrait'
-                    ? 'bg-theme-primary text-white'
-                    : 'text-theme-text hover:bg-theme-primary-opaque-20'
+                  pdfOrientation === "portrait"
+                    ? "bg-theme-primary text-white"
+                    : "text-theme-text hover:bg-theme-primary-opaque-20"
                 }`}
                 title="Portrait"
               >
                 <Smartphone size={16} />
               </button>
               <button
-                onClick={() => setPdfOrientation('landscape')}
+                onClick={() => setPdfOrientation("landscape")}
                 className={`p-2 rounded transition-colors ${
-                  pdfOrientation === 'landscape'
-                    ? 'bg-theme-primary text-white'
-                    : 'text-theme-text hover:bg-theme-primary-opaque-20'
+                  pdfOrientation === "landscape"
+                    ? "bg-theme-primary text-white"
+                    : "text-theme-text hover:bg-theme-primary-opaque-20"
                 }`}
                 title="Landscape"
               >
                 <Monitor size={16} />
               </button>
             </div>
-            
+
             {/* Export Button */}
             <button
               onClick={exportToPDF}
@@ -492,19 +602,16 @@ const EnhancePDFBuilder = () => {  // Core state
           </div>
         </div>
       </header>
-
       {/* PDF Settings Panel */}
       <AnimatePresence>
         {showSettings && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="bg-theme-secondary border-b border-theme-border overflow-hidden"
-          >
-            <div className="max-w-7xl mx-auto p-6">
+          >            <div className="max-w-7xl mx-auto p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                
                 {/* Margins */}
                 <div className="space-y-3">
                   <h3 className="font-semibold text-theme-text flex items-center gap-2">
@@ -513,44 +620,64 @@ const EnhancePDFBuilder = () => {  // Core state
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-xs text-theme-text-secondary">Top</label>
+                      <label className="text-xs text-theme-text-secondary">
+                        Top
+                      </label>
                       <input
                         type="number"
                         value={pdfSettings.margins.top}
-                        onChange={(e) => updateMargins({ top: parseInt(e.target.value) || 0 })}
+                        onChange={(e) =>
+                          updateMargins({ top: parseInt(e.target.value) || 0 })
+                        }
                         className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                         min="0"
                         max="200"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-theme-text-secondary">Bottom</label>
+                      <label className="text-xs text-theme-text-secondary">
+                        Bottom
+                      </label>
                       <input
                         type="number"
                         value={pdfSettings.margins.bottom}
-                        onChange={(e) => updateMargins({ bottom: parseInt(e.target.value) || 0 })}
+                        onChange={(e) =>
+                          updateMargins({
+                            bottom: parseInt(e.target.value) || 0,
+                          })
+                        }
                         className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                         min="0"
                         max="200"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-theme-text-secondary">Left</label>
+                      <label className="text-xs text-theme-text-secondary">
+                        Left
+                      </label>
                       <input
                         type="number"
                         value={pdfSettings.margins.left}
-                        onChange={(e) => updateMargins({ left: parseInt(e.target.value) || 0 })}
+                        onChange={(e) =>
+                          updateMargins({ left: parseInt(e.target.value) || 0 })
+                        }
                         className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                         min="0"
                         max="200"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-theme-text-secondary">Right</label>
+                      <label className="text-xs text-theme-text-secondary">
+                        Right
+                      </label>
                       <input
                         type="number"
                         value={pdfSettings.margins.right}
-                        onChange={(e) => updateMargins({ right: parseInt(e.target.value) || 0 })}
+                        onChange={(e) =>
+                          updateMargins({
+                            right: parseInt(e.target.value) || 0,
+                          })
+                        }
                         className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                         min="0"
                         max="200"
@@ -567,44 +694,64 @@ const EnhancePDFBuilder = () => {  // Core state
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-xs text-theme-text-secondary">Top</label>
+                      <label className="text-xs text-theme-text-secondary">
+                        Top
+                      </label>
                       <input
                         type="number"
                         value={pdfSettings.padding.top}
-                        onChange={(e) => updatePadding({ top: parseInt(e.target.value) || 0 })}
+                        onChange={(e) =>
+                          updatePadding({ top: parseInt(e.target.value) || 0 })
+                        }
                         className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                         min="0"
                         max="100"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-theme-text-secondary">Bottom</label>
+                      <label className="text-xs text-theme-text-secondary">
+                        Bottom
+                      </label>
                       <input
                         type="number"
                         value={pdfSettings.padding.bottom}
-                        onChange={(e) => updatePadding({ bottom: parseInt(e.target.value) || 0 })}
+                        onChange={(e) =>
+                          updatePadding({
+                            bottom: parseInt(e.target.value) || 0,
+                          })
+                        }
                         className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                         min="0"
                         max="100"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-theme-text-secondary">Left</label>
+                      <label className="text-xs text-theme-text-secondary">
+                        Left
+                      </label>
                       <input
                         type="number"
                         value={pdfSettings.padding.left}
-                        onChange={(e) => updatePadding({ left: parseInt(e.target.value) || 0 })}
+                        onChange={(e) =>
+                          updatePadding({ left: parseInt(e.target.value) || 0 })
+                        }
                         className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                         min="0"
                         max="100"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-theme-text-secondary">Right</label>
+                      <label className="text-xs text-theme-text-secondary">
+                        Right
+                      </label>
                       <input
                         type="number"
                         value={pdfSettings.padding.right}
-                        onChange={(e) => updatePadding({ right: parseInt(e.target.value) || 0 })}
+                        onChange={(e) =>
+                          updatePadding({
+                            right: parseInt(e.target.value) || 0,
+                          })
+                        }
                         className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                         min="0"
                         max="100"
@@ -621,23 +768,145 @@ const EnhancePDFBuilder = () => {  // Core state
                   </h3>
                   <div className="space-y-2">
                     {[
-                      { value: 'fit', label: 'Fit', icon: Minimize },
-                      { value: 'cover', label: 'Cover', icon: Maximize },
-                      { value: 'stretch', label: 'Stretch', icon: Square }
+                      { value: "fit", label: "Fit", icon: Minimize },
+                      { value: "cover", label: "Cover", icon: Maximize },
+                      { value: "stretch", label: "Stretch", icon: Square },
                     ].map(({ value, label, icon: Icon }) => (
                       <button
                         key={value}
-                        onClick={() => updatePdfSettings({ imageFitMode: value })}
+                        onClick={() =>
+                          updatePdfSettings({ imageFitMode: value })
+                        }
                         className={`w-full p-2 rounded text-sm transition-colors flex items-center gap-2 ${
                           pdfSettings.imageFitMode === value
-                            ? 'bg-theme-primary text-white'
-                            : 'bg-theme-background hover:bg-theme-primary-opaque-20 text-theme-text border border-theme-border'
+                            ? "bg-theme-primary text-white"
+                            : "bg-theme-background hover:bg-theme-primary-opaque-20 text-theme-text border border-theme-border"
                         }`}
                       >
                         <Icon size={14} />
                         {label}
                       </button>
                     ))}
+                  </div>
+                </div>                {/* Image Spacing */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-theme-text flex items-center gap-2">
+                    <Droplets size={16} />
+                    Image Spacing
+                  </h3>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs text-theme-text-secondary">
+                        Spacing (px)
+                      </label>
+                      <span className="text-xs text-theme-primary font-medium">
+                        {pdfSettings.imageSpacing}px
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={pdfSettings.imageSpacing}
+                      onChange={(e) => updateImageSpacing(parseInt(e.target.value) || 0)}
+                      className="w-full h-2 bg-theme-background rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-theme-text-secondary mt-1">
+                      <span>None</span>
+                      <span>Medium</span>
+                      <span>Large</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Text Settings */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-theme-text flex items-center gap-2">
+                    <Type size={16} />
+                    Text Settings
+                  </h3>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={pdfSettings.textSettings.enabled}
+                        onChange={(e) =>
+                          updateTextSettings({ enabled: e.target.checked })
+                        }
+                        className="rounded"
+                      />
+                      <span className="text-sm text-theme-text">
+                        Enable Image Captions
+                      </span>
+                    </label>
+
+                    {pdfSettings.textSettings.enabled && (
+                      <>
+                        <div>
+                          <label className="text-xs text-theme-text-secondary">
+                            Font Size
+                          </label>
+                          <input
+                            type="number"
+                            value={pdfSettings.textSettings.fontSize}
+                            onChange={(e) =>
+                              updateTextSettings({
+                                fontSize: parseInt(e.target.value) || 0,
+                              })
+                            }
+                            className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
+                            min="8"
+                            max="36"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs text-theme-text-secondary">
+                            Color
+                          </label>
+                          <input
+                            type="color"
+                            value={pdfSettings.textSettings.color}
+                            onChange={(e) =>
+                              updateTextSettings({ color: e.target.value })
+                            }
+                            className="w-full h-10 rounded"
+                          />
+                        </div>                        <div>
+                          <label className="text-xs text-theme-text-secondary">
+                            Position
+                          </label>
+                          <select
+                            value={pdfSettings.textSettings.position}
+                            onChange={(e) =>
+                              updateTextSettings({ position: e.target.value })
+                            }
+                            className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
+                            title="Choose where captions appear relative to images"
+                          >
+                            <option value="below">Below Image</option>
+                            <option value="above">Above Image</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs text-theme-text-secondary">
+                            Alignment
+                          </label>
+                          <select
+                            value={pdfSettings.textSettings.alignment}
+                            onChange={(e) =>
+                              updateTextSettings({ alignment: e.target.value })
+                            }
+                            className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
+                          >
+                            <option value="center">Center</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                          </select>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -652,44 +921,64 @@ const EnhancePDFBuilder = () => {  // Core state
                       <input
                         type="checkbox"
                         checked={pdfSettings.watermark.enabled}
-                        onChange={(e) => updateWatermark({ enabled: e.target.checked })}
+                        onChange={(e) =>
+                          updateWatermark({ enabled: e.target.checked })
+                        }
                         className="rounded"
                       />
-                      <span className="text-sm text-theme-text">Enable Watermark</span>
+                      <span className="text-sm text-theme-text">
+                        Enable Watermark
+                      </span>
                     </label>
-                    
+
                     {pdfSettings.watermark.enabled && (
                       <>
                         <div>
-                          <label className="text-xs text-theme-text-secondary">Text</label>
+                          <label className="text-xs text-theme-text-secondary">
+                            Text
+                          </label>
                           <input
                             type="text"
                             value={pdfSettings.watermark.text}
-                            onChange={(e) => updateWatermark({ text: e.target.value })}
+                            onChange={(e) =>
+                              updateWatermark({ text: e.target.value })
+                            }
                             placeholder="Watermark text"
                             className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                           />
                         </div>
-                        
+
                         <div>
-                          <label className="text-xs text-theme-text-secondary">Opacity</label>
+                          <label className="text-xs text-theme-text-secondary">
+                            Opacity
+                          </label>
                           <input
                             type="range"
                             min="0.1"
                             max="1"
                             step="0.1"
                             value={pdfSettings.watermark.opacity}
-                            onChange={(e) => updateWatermark({ opacity: parseFloat(e.target.value) })}
+                            onChange={(e) =>
+                              updateWatermark({
+                                opacity: parseFloat(e.target.value),
+                              })
+                            }
                             className="w-full"
                           />
-                          <span className="text-xs text-theme-text-secondary">{(pdfSettings.watermark.opacity * 100).toFixed(0)}%</span>
+                          <span className="text-xs text-theme-text-secondary">
+                            {(pdfSettings.watermark.opacity * 100).toFixed(0)}%
+                          </span>
                         </div>
-                        
+
                         <div>
-                          <label className="text-xs text-theme-text-secondary">Position</label>
+                          <label className="text-xs text-theme-text-secondary">
+                            Position
+                          </label>
                           <select
                             value={pdfSettings.watermark.position}
-                            onChange={(e) => updateWatermark({ position: e.target.value })}
+                            onChange={(e) =>
+                              updateWatermark({ position: e.target.value })
+                            }
                             className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
                           >
                             <option value="center">Center</option>
@@ -697,6 +986,114 @@ const EnhancePDFBuilder = () => {  // Core state
                             <option value="top-right">Top Right</option>
                             <option value="bottom-left">Bottom Left</option>
                             <option value="bottom-right">Bottom Right</option>
+                          </select>
+                        </div>
+                      </>                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Second row for new settings */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">                {/* Image Spacing */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-theme-text flex items-center gap-2">
+                    <Square size={16} />
+                    Image Spacing
+                  </h3>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs text-theme-text-secondary">
+                        Space between images (px)
+                      </label>
+                      <span className="text-xs text-theme-primary font-medium">
+                        {pdfSettings.imageSpacing}px
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={pdfSettings.imageSpacing}
+                      onChange={(e) => updateImageSpacing(parseInt(e.target.value) || 0)}
+                      className="w-full h-2 bg-theme-background rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-theme-text-secondary mt-1">
+                      <span>0px</span>
+                      <span>50px</span>
+                      <span>100px</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Text Captions */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-theme-text flex items-center gap-2">
+                    <Type size={16} />
+                    Image Captions
+                  </h3>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={pdfSettings.textSettings.enabled}
+                        onChange={(e) =>
+                          updateTextSettings({ enabled: e.target.checked })
+                        }
+                        className="rounded"
+                      />
+                      <span className="text-sm text-theme-text">
+                        Enable Image Captions
+                      </span>
+                    </label>
+
+                    {pdfSettings.textSettings.enabled && (
+                      <>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-xs text-theme-text-secondary">
+                              Font Size
+                            </label>
+                            <input
+                              type="number"
+                              value={pdfSettings.textSettings.fontSize}
+                              onChange={(e) =>
+                                updateTextSettings({
+                                  fontSize: parseInt(e.target.value) || 12,
+                                })
+                              }
+                              className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
+                              min="8"
+                              max="24"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-theme-text-secondary">
+                              Color
+                            </label>
+                            <input
+                              type="color"
+                              value={pdfSettings.textSettings.color}
+                              onChange={(e) =>
+                                updateTextSettings({ color: e.target.value })
+                              }
+                              className="w-full h-8 bg-theme-background border border-theme-border rounded"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs text-theme-text-secondary">
+                            Alignment
+                          </label>
+                          <select
+                            value={pdfSettings.textSettings.alignment}
+                            onChange={(e) =>
+                              updateTextSettings({ alignment: e.target.value })
+                            }
+                            className="w-full px-2 py-1 bg-theme-background border border-theme-border rounded text-sm"
+                          >
+                            <option value="left">Left</option>
+                            <option value="center">Center</option>
+                            <option value="right">Right</option>
                           </select>
                         </div>
                       </>
@@ -707,18 +1104,40 @@ const EnhancePDFBuilder = () => {  // Core state
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
-
+      </AnimatePresence>{" "}
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">          {/* Left Section - Image Upload */}
+        {/* Back Button */}
+        {onNavigate && (
+          <button
+            onClick={() => onNavigate("landing")}
+            className="flex items-center gap-2 px-4 py-2 bg-theme-secondary border border-theme-border text-theme-text-secondary hover:text-theme-primary hover:border-theme-primary rounded-lg transition-all duration-200 mb-6"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Home
+          </button>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Section - Image Upload */}
           <div className="lg:col-span-1">
             <div className="card-theme p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <ImageIcon size={20} />
                 Image Library
               </h2>
-              
               {/* Upload Area */}
               <div
                 {...getRootProps()}
@@ -729,7 +1148,10 @@ const EnhancePDFBuilder = () => {  // Core state
                 }`}
               >
                 <input {...getInputProps()} />
-                <Upload className="mx-auto mb-4 text-theme-text-secondary" size={32} />
+                <Upload
+                  className="mx-auto mb-4 text-theme-text-secondary"
+                  size={32}
+                />
                 <p className="text-theme-text">
                   {isDragActive
                     ? "Drop images here..."
@@ -738,7 +1160,8 @@ const EnhancePDFBuilder = () => {  // Core state
                 <p className="text-sm text-theme-text-secondary mt-2">
                   Supports PNG, JPG, JPEG, GIF, BMP, WebP
                 </p>
-              </div>              {/* Image List */}
+              </div>{" "}
+              {/* Image List */}
               <div className="mt-4 space-y-2 max-h-64 overflow-y-auto">
                 {images.map((image) => (
                   <div
@@ -752,7 +1175,7 @@ const EnhancePDFBuilder = () => {  // Core state
                         className="w-12 h-12 object-cover rounded"
                         style={{
                           transform: `rotate(${image.rotation || 0}deg)`,
-                          transition: 'transform 0.3s ease'
+                          transition: "transform 0.3s ease",
                         }}
                       />
                       {(image.rotation || 0) !== 0 && (
@@ -760,14 +1183,24 @@ const EnhancePDFBuilder = () => {  // Core state
                           {image.rotation}°
                         </div>
                       )}
-                    </div>
-                    <div className="flex-1 min-w-0">
+                    </div>                    <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate text-theme-text">
                         {image.name}
                       </p>
                       <p className="text-xs text-theme-text-secondary">
                         {formatFileSize(image.size)}
                       </p>
+                      {pdfSettings.textSettings.enabled && (
+                        <div className="mt-2">
+                          <input
+                            type="text"
+                            placeholder="Add caption..."
+                            value={image.caption || ""}
+                            onChange={(e) => updateImageCaption(image.id, e.target.value)}
+                            className="w-full px-2 py-1 text-xs bg-theme-background border border-theme-border rounded"
+                          />
+                        </div>
+                      )}
                     </div>
                     <div className="flex gap-1">
                       <button
@@ -800,7 +1233,9 @@ const EnhancePDFBuilder = () => {  // Core state
 
           {/* Right Section - Pages and Current Page */}
           <div className="lg:col-span-2">
-            <div className="space-y-6">              {/* Page Tabs */}
+            <div className="space-y-6">
+              {" "}
+              {/* Page Tabs */}
               <div className="card-theme p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -844,16 +1279,21 @@ const EnhancePDFBuilder = () => {  // Core state
                     </div>
                   ))}
                 </div>
-              </div>{" "}              {/* Current Page Content */}
+              </div>{" "}
+              {/* Current Page Content */}
               <div className="card-theme p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-theme-text">
+                <div className="flex items-center justify-between mb-4">                  <h3 className="text-lg font-semibold text-theme-text">
                     Page {pages.findIndex((p) => p.id === currentPage) + 1}{" "}
                     Content
                   </h3>
-                  <span className="text-sm text-theme-text-secondary">
-                    {getCurrentPage().images.length} images
-                  </span>
+                  <div className="flex items-center gap-4 text-sm text-theme-text-secondary">
+                    <span>{getCurrentPage().images.length} images</span>
+                    {pdfSettings.textSettings.enabled && (
+                      <span className="text-blue-400">
+                        {getCurrentPage().images.filter(img => img.caption && img.caption.trim()).length} with captions
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {getCurrentPage().images.length === 0 ? (
@@ -863,62 +1303,108 @@ const EnhancePDFBuilder = () => {  // Core state
                     <p className="text-sm mt-2">
                       Add images from the library on the left
                     </p>
-                  </div>
-                ) : (                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {getCurrentPage().images.map((image, index) => (
-                      <div
-                        key={`${image.id}-${index}`}
-                        className="relative group bg-theme-secondary rounded-lg overflow-hidden border border-theme-border"
-                      >
-                        <img
-                          src={image.url}
-                          alt={image.name}
-                          className="w-full h-32 object-cover transition-transform duration-300"
-                          style={{
-                            transform: `rotate(${image.rotation || 0}deg)`
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => rotateImage(image.id)}
-                            className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors"
-                            title="Rotate 90°"
-                          >
-                            <RotateCw size={16} />
-                          </button>
-                          <button
-                            onClick={() => removeImageFromPage(image.id)}
-                            className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
-                            title="Remove from page"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 p-2">
-                          <p className="text-xs text-white truncate">
-                            {image.name}
-                          </p>
-                          {(image.rotation || 0) !== 0 && (
-                            <p className="text-xs text-blue-300">
-                              {image.rotation}° rotated
-                            </p>
+                  </div>                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {getCurrentPage().images.map((image, index) => (
+                        <div
+                          key={`${image.id}-${index}`}
+                          className="bg-theme-secondary rounded-lg border border-theme-border overflow-hidden"
+                        >
+                          <div className="relative group">
+                            <img
+                              src={image.url}
+                              alt={image.name}
+                              className="w-full h-32 object-cover transition-transform duration-300"
+                              style={{
+                                transform: `rotate(${image.rotation || 0}deg)`,
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => rotateImage(image.id)}
+                                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors"
+                                title="Rotate 90°"
+                              >
+                                <RotateCw size={16} />
+                              </button>
+                              <button
+                                onClick={() => removeImageFromPage(image.id)}
+                                className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                                title="Remove from page"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 p-2">
+                              <p className="text-xs text-white truncate">
+                                {image.name}
+                              </p>
+                              {(image.rotation || 0) !== 0 && (
+                                <p className="text-xs text-blue-300">
+                                  {image.rotation}° rotated
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Caption input for page images */}
+                          {pdfSettings.textSettings.enabled && (
+                            <div className="p-3 border-t border-theme-border">
+                              <label className="text-xs text-theme-text-secondary mb-1 block">
+                                Caption:
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Add caption for this image..."
+                                value={image.caption || ""}
+                                onChange={(e) => updateImageCaption(image.id, e.target.value)}
+                                className="w-full px-2 py-1 text-xs bg-theme-background border border-theme-border rounded focus:outline-none focus:border-theme-primary"
+                              />
+                            </div>
                           )}
                         </div>
+                      ))}
+                    </div>
+                    
+                    {/* Caption settings reminder */}
+                    {!pdfSettings.textSettings.enabled && (
+                      <div className="text-center py-4 bg-theme-background rounded-lg border border-theme-border">
+                        <Type size={20} className="mx-auto mb-2 text-theme-text-secondary opacity-50" />
+                        <p className="text-sm text-theme-text-secondary">
+                          Enable "Image Captions" in PDF Settings to add captions
+                        </p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 )}
-              </div>              {/* PDF Preview Section */}
-              <div className="card-theme p-6">
-                <div className="flex items-center justify-between mb-4">
+              </div>{" "}
+              {/* PDF Preview Section */}
+              <div className="card-theme p-6">                <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold flex items-center gap-2 text-theme-text">
                     <FileText size={20} />
                     PDF Preview
                   </h3>
-                  <span className="text-sm text-theme-text-secondary">
-                    How it will look in PDF
-                  </span>
-                </div>                {getCurrentPage().images.length === 0 ? (
+                  <div className="flex items-center gap-3 text-xs">
+                    {/* Active settings indicators */}
+                    {pdfSettings.textSettings.enabled && (
+                      <div className="flex items-center gap-1 bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
+                        <Type size={12} />
+                        <span>Captions</span>
+                      </div>
+                    )}
+                    {pdfSettings.imageSpacing > 0 && (
+                      <div className="flex items-center gap-1 bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                        <Square size={12} />
+                        <span>{pdfSettings.imageSpacing}px spacing</span>
+                      </div>
+                    )}
+                    <span className="text-theme-text-secondary">
+                      How it will look in PDF
+                    </span>
+                  </div>
+                </div>{" "}
+                {getCurrentPage().images.length === 0 ? (
                   <div className="text-center py-12 text-theme-text-secondary">
                     <FileText size={48} className="mx-auto mb-4 opacity-50" />
                     <p>No preview available</p>
@@ -926,47 +1412,165 @@ const EnhancePDFBuilder = () => {  // Core state
                       Add images to see PDF layout preview
                     </p>
                   </div>
-                ) : (                  <div className="bg-theme-secondary rounded-lg p-4 shadow-inner">
+                ) : (
+                  <div className="bg-theme-secondary rounded-lg p-4 shadow-inner">
                     {/* PDF Page Preview */}
                     <div
-                      className="bg-theme-secondary border border-theme-border rounded mx-auto"
+                      className="bg-white border-2 border-gray-300 rounded mx-auto relative shadow-lg"
                       style={{
-                        width: pdfOrientation === 'landscape' ? "400px" : "300px",
-                        height: pdfOrientation === 'landscape' ? "300px" : "400px",
-                        aspectRatio: pdfOrientation === 'landscape' ? "297/210" : "210/297",
+                        width:
+                          pdfOrientation === "landscape" ? "400px" : "300px",
+                        height:
+                          pdfOrientation === "landscape" ? "300px" : "400px",
+                        aspectRatio:
+                          pdfOrientation === "landscape"
+                            ? "297/210"
+                            : "210/297",
                       }}
                     >
-                      <div className="h-full p-4 flex flex-col justify-start gap-2">
-                        {getCurrentPage().images.map((image, index) => {
-                          const containerHeight = pdfOrientation === 'landscape' ? 300 : 400;
-                          const imageHeight = (containerHeight - 32) / getCurrentPage().images.length;
-                          return (
-                            <div
-                              key={`preview-${image.id}-${index}`}
-                              className="bg-theme-background border border-theme-border rounded flex items-center justify-center relative overflow-hidden"
-                              style={{ height: `${imageHeight - 8}px` }}
-                            >
-                              <img
-                                src={image.url}
-                                alt={image.name}
-                                className="max-w-full max-h-full object-contain transition-transform duration-300"
-                                style={{
-                                  transform: `rotate(${image.rotation || 0}deg)`
-                                }}
-                              />
-                              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 truncate">
-                                {image.name}
-                                {(image.rotation || 0) !== 0 && (
-                                  <span className="text-blue-300 ml-1">({image.rotation}°)</span>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
+                      {/* Margin Visualization */}
+                      <div
+                        className="absolute inset-0 border border-dashed border-blue-300 rounded pointer-events-none"
+                        style={{
+                          top: `${(pdfSettings.margins.top / (pdfOrientation === "landscape" ? 300 : 400)) * 100}%`,
+                          bottom: `${(pdfSettings.margins.bottom / (pdfOrientation === "landscape" ? 300 : 400)) * 100}%`,
+                          left: `${(pdfSettings.margins.left / (pdfOrientation === "landscape" ? 400 : 300)) * 100}%`,
+                          right: `${(pdfSettings.margins.right / (pdfOrientation === "landscape" ? 400 : 300)) * 100}%`,
+                        }}
+                      >
+                        {/* Padding Visualization */}
+                        <div
+                          className="h-full border border-dashed border-green-300 rounded"
+                          style={{
+                            margin: `${pdfSettings.padding.top}px ${pdfSettings.padding.right}px ${pdfSettings.padding.bottom}px ${pdfSettings.padding.left}px`,
+                          }}
+                        >                          {/* Content Area with proper spacing and captions */}
+                          <div className="h-full flex flex-col justify-start p-1" style={{ gap: `${pdfSettings.imageSpacing * 0.1}px` }}>
+                            {getCurrentPage().images.map((image, index) => {
+                              const containerHeight = pdfOrientation === "landscape" ? 300 : 400;
+                              const availableHeight =
+                                containerHeight -
+                                pdfSettings.margins.top -
+                                pdfSettings.margins.bottom -
+                                pdfSettings.padding.top -
+                                pdfSettings.padding.bottom;
+                              
+                              // Calculate height accounting for captions and spacing
+                              const totalSpacing = (getCurrentPage().images.length - 1) * (pdfSettings.imageSpacing * 0.1);
+                              const captionHeight = pdfSettings.textSettings.enabled && image.caption ? 16 : 0;
+                              const imageHeight = Math.max(
+                                (availableHeight - totalSpacing) / getCurrentPage().images.length - captionHeight,
+                                20
+                              );
+
+                              return (
+                                <div key={`preview-${image.id}-${index}`} className="flex flex-col">
+                                  <div
+                                    className="bg-gray-50 border border-gray-200 rounded flex items-center justify-center relative overflow-hidden"
+                                    style={{ height: `${imageHeight}px` }}
+                                  >
+                                    <img
+                                      src={image.url}
+                                      alt={image.name}
+                                      className="transition-transform duration-300"
+                                      style={{
+                                        transform: `rotate(${image.rotation || 0}deg)`,
+                                        maxWidth: pdfSettings.imageFitMode === "stretch" ? "100%" : "auto",
+                                        maxHeight: pdfSettings.imageFitMode === "stretch" ? "100%" : "auto",
+                                        width: pdfSettings.imageFitMode === "stretch" ? "100%" : 
+                                               pdfSettings.imageFitMode === "cover" ? "100%" : "auto",
+                                        height: pdfSettings.imageFitMode === "stretch" ? "100%" : 
+                                                pdfSettings.imageFitMode === "cover" ? "100%" : "auto",
+                                        objectFit: pdfSettings.imageFitMode === "cover" ? "cover" : "contain",
+                                      }}
+                                    />
+                                    
+                                    {/* Image name overlay */}
+                                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 truncate">
+                                      {image.name}
+                                      {(image.rotation || 0) !== 0 && (
+                                        <span className="text-blue-300 ml-1">({image.rotation}°)</span>
+                                      )}
+                                    </div>
+
+                                    {/* Watermark Preview */}
+                                    {pdfSettings.watermark.enabled && pdfSettings.watermark.text && (
+                                      <div
+                                        className="absolute text-xs pointer-events-none select-none"
+                                        style={{
+                                          color: pdfSettings.watermark.color,
+                                          opacity: pdfSettings.watermark.opacity,
+                                          fontSize: `${Math.max(pdfSettings.watermark.fontSize / 4, 8)}px`,
+                                          ...(pdfSettings.watermark.position === "center" && {
+                                            top: "50%",
+                                            left: "50%",
+                                            transform: "translate(-50%, -50%)",
+                                          }),
+                                          ...(pdfSettings.watermark.position === "top-left" && {
+                                            top: "4px",
+                                            left: "4px",
+                                          }),
+                                          ...(pdfSettings.watermark.position === "top-right" && {
+                                            top: "4px",
+                                            right: "4px",
+                                          }),
+                                          ...(pdfSettings.watermark.position === "bottom-left" && {
+                                            bottom: "20px",
+                                            left: "4px",
+                                          }),
+                                          ...(pdfSettings.watermark.position === "bottom-right" && {
+                                            bottom: "20px",
+                                            right: "4px",
+                                          }),
+                                        }}
+                                      >
+                                        {pdfSettings.watermark.text}
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Caption Preview */}
+                                  {pdfSettings.textSettings.enabled && image.caption && image.caption.trim() && (
+                                    <div 
+                                      className="text-xs mt-1 px-1"
+                                      style={{ 
+                                        color: pdfSettings.textSettings.color,
+                                        fontSize: `${Math.max(pdfSettings.textSettings.fontSize * 0.7, 8)}px`,
+                                        textAlign: pdfSettings.textSettings.alignment 
+                                      }}
+                                    >
+                                      {image.caption}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
-                    </div>                    <div className="text-center mt-3 text-theme-text-secondary text-sm">
+                    </div>{" "}
+                    <div className="text-center mt-3 text-theme-text-secondary text-sm">
                       Page {pages.findIndex((p) => p.id === currentPage) + 1}{" "}
-                      Preview ({pdfOrientation === 'landscape' ? 'Landscape' : 'Portrait'})
+                      Preview (
+                      {pdfOrientation === "landscape"
+                        ? "Landscape"
+                        : "Portrait"}
+                      )
+                    </div>
+                    {/* Settings Legend */}
+                    <div className="flex justify-center gap-6 mt-2 text-xs text-theme-text-secondary">
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-0.5 border-b border-dashed border-blue-300"></div>
+                        <span>Margins</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-0.5 border-b border-dashed border-green-300"></div>
+                        <span>Padding</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-gray-50 border border-gray-200 rounded-sm"></div>
+                        <span>Content Area</span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -975,7 +1579,6 @@ const EnhancePDFBuilder = () => {  // Core state
           </div>
         </div>
       </div>
-
       {/* Error Toast */}
       <AnimatePresence>
         {error && (
@@ -1001,7 +1604,6 @@ const EnhancePDFBuilder = () => {  // Core state
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Processing Modal */}
       <AnimatePresence>
         {isProcessing && (
@@ -1010,10 +1612,14 @@ const EnhancePDFBuilder = () => {  // Core state
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          >            <div className="bg-theme-secondary p-6 rounded-lg">
+          >
+            {" "}
+            <div className="bg-theme-secondary p-6 rounded-lg">
               <div className="text-center">
                 <LoadingSpinner size="lg" className="mb-4" />
-                <h3 className="text-lg font-semibold mb-2 text-theme-text">Exporting PDF...</h3>
+                <h3 className="text-lg font-semibold mb-2 text-theme-text">
+                  Exporting PDF...
+                </h3>
                 <div className="w-64 bg-theme-border rounded-full h-2">
                   <div
                     className="bg-theme-primary h-2 rounded-full transition-all"
