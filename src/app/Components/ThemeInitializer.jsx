@@ -80,6 +80,78 @@ const ThemeInitializer = () => {
         warning: "#F59E0B",
         error: "#EF4444",
       },
+      pink: {
+        primary: "#D1006B",
+        background: "#1B1F24",
+        secondary: "#2D2A33",
+        text: "#F1F5F9",
+        textSecondary: "#FBBF24",
+        border: "#FBBF24",
+        accent: "#D1006B",
+        success: "#10B981",
+        warning: "#F59E0B",
+        error: "#EF4444",
+      },
+      yellow: {
+        primary: "#FBBF24",
+        background: "#1B212C",
+        secondary: "#151B24",
+        text: "#E1E6EB",
+        textSecondary: "#A0AEC0",
+        border: "#A0AEC0",
+        accent: "#FBBF24",
+        success: "#10B981",
+        warning: "#F59E0B",
+        error: "#EF4444",
+      },
+      gray: {
+        primary: "#6B7280",
+        background: "#1F2937",
+        secondary: "#374151",
+        text: "#F3F4F6",
+        textSecondary: "#D1D5DB",
+        border: "#9CA3AF",
+        accent: "#6B7280",
+        success: "#10B981",
+        warning: "#F59E0B",
+        error: "#EF4444",
+      },
+      teal: {
+        primary: "#14B8A6",
+        background: "#0F172A",
+        secondary: "#1E293B",
+        text: "#F1F5F9",
+        textSecondary: "#94A3B8",
+        border: "#334155",
+        accent: "#14B8A6",
+        success: "#10B981",
+        warning: "#F59E0B",
+        error: "#EF4444",
+      },
+      zinc : {
+        primary: "#3F3F46",
+        background: "#1C1C22",
+        secondary: "#27272A",
+        text: "#F4F4F5",
+        textSecondary: "#A1A1AA",
+        border: "#4B4B4D",
+        accent: "#3F3F46",
+        success: "#10B981",
+        warning: "#F59E0B",
+        error: "#EF4444",
+      },
+      slate: {
+        primary: "#64748B",
+        background: "#0F172A",
+        secondary: "#1E293B",
+        text: "#F1F5F9",
+        textSecondary: "#94A3B8",
+        border: "#334155",
+        accent: "#64748B",
+        success: "#10B981",
+        warning: "#F59E0B",
+        error: "#EF4444",
+      },
     };
 
     const accessibilityOptions = {
@@ -94,9 +166,7 @@ const ThemeInitializer = () => {
         high: { filter: "contrast(1.5)" },
         extraHigh: { filter: "contrast(2)" },
       },
-    };
-
-    const theme = themes[savedTheme];
+    };    const theme = themes[savedTheme];
     const root = document.documentElement;
 
     // Apply theme colors
@@ -104,6 +174,20 @@ const ThemeInitializer = () => {
       Object.entries(theme).forEach(([key, value]) => {
         root.style.setProperty(`--color-${key}`, value);
       });
+    } else if (savedTheme.startsWith('custom-')) {
+      // Handle custom themes
+      try {
+        const customThemes = JSON.parse(localStorage.getItem("pdf-merger-custom-themes") || "[]");
+        const customTheme = customThemes.find(theme => theme.id === savedTheme);
+        
+        if (customTheme && customTheme.colors) {
+          Object.entries(customTheme.colors).forEach(([key, value]) => {
+            root.style.setProperty(`--color-${key}`, value);
+          });
+        }
+      } catch (error) {
+        console.error("Failed to parse custom theme:", error);
+      }
     }
 
     // Apply accessibility settings

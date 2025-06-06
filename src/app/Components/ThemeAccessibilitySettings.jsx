@@ -18,7 +18,9 @@ import {
   RotateCcw,
   Check,
   X,
+  PenTool,
 } from "lucide-react";
+import CustomThemeCreator from "./CustomThemeCreator";
 
 // Theme Context
 const ThemeContext = createContext();
@@ -183,15 +185,32 @@ export const ThemeProvider = ({ children }) => {
       }
     }
   }, []);
-
   // Apply theme
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const theme = themes[currentTheme];
+      let themeColors;
+      
+      // Check if this is a custom theme
+      if (currentTheme.startsWith('custom-')) {
+        const customThemes = JSON.parse(localStorage.getItem("pdf-merger-custom-themes") || "[]");
+        const customTheme = customThemes.find(theme => theme.id === currentTheme);
+        
+        if (customTheme) {
+          themeColors = customTheme.colors;
+        } else {
+          // Fallback to default theme if custom theme not found
+          themeColors = themes["dark"].colors;
+        }
+      } else {
+        // Use predefined theme
+        const theme = themes[currentTheme];
+        themeColors = theme?.colors;
+      }
+      
       const root = document.documentElement;
 
-      if (theme && theme.colors) {
-        Object.entries(theme.colors).forEach(([key, value]) => {
+      if (themeColors) {
+        Object.entries(themeColors).forEach(([key, value]) => {
           root.style.setProperty(`--color-${key}`, value);
         });
       }
@@ -272,9 +291,9 @@ const ThemeAccessibilitySettings = ({ isOpen, onClose, onNavigate }) => {
     resetSettings,
   } = useTheme();
   const [activeTab, setActiveTab] = useState("themes");
-
   const tabs = [
     { id: "themes", name: "Themes", icon: Palette },
+    { id: "custom", name: "Custom", icon: PenTool },
     { id: "accessibility", name: "Accessibility", icon: Accessibility },
     { id: "display", name: "Display", icon: Eye },
   ];
@@ -462,8 +481,7 @@ const TabContent = ({ activeTab }) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3 }}
-      >
-        {/* Themes Tab */}
+      >        {/* Themes Tab */}
         {activeTab === "themes" && (
           <div className="space-y-6">
             <div>
@@ -532,8 +550,12 @@ const TabContent = ({ activeTab }) => {
                   );
                 })}
               </div>
-            </div>
-          </div>
+            </div>          </div>
+        )}
+
+        {/* Custom Theme Creator Tab */}
+        {activeTab === "custom" && (
+          <CustomThemeCreator />
         )}
 
         {/* Accessibility Tab */}
