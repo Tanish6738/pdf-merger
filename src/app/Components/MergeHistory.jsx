@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   History,
   FileText,
@@ -9,9 +9,13 @@ import {
   Calendar,
   FolderOpen,
   X,
-  RefreshCw
-} from 'lucide-react';
-import { getMergeHistory, clearMergeHistory, formatFileSize } from '../utils/pdfHelpers';
+  RefreshCw,
+} from "lucide-react";
+import {
+  getMergeHistory,
+  clearMergeHistory,
+  formatFileSize,
+} from "../utils/pdfHelpers";
 
 const MergeHistory = ({ isOpen, onClose }) => {
   const [history, setHistory] = useState([]);
@@ -29,14 +33,14 @@ const MergeHistory = ({ isOpen, onClose }) => {
       const historyData = getMergeHistory();
       setHistory(historyData);
     } catch (error) {
-      console.error('Error loading history:', error);
+      console.error("Error loading history:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleClearHistory = () => {
-    if (window.confirm('Are you sure you want to clear all merge history?')) {
+    if (window.confirm("Are you sure you want to clear all merge history?")) {
       clearMergeHistory();
       setHistory([]);
     }
@@ -61,20 +65,24 @@ const MergeHistory = ({ isOpen, onClose }) => {
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="bg-[#151B24] rounded-2xl border border-[#A0AEC0]/20 w-full max-w-4xl max-h-[80vh] overflow-hidden"
+          className="bg-theme-secondary rounded-2xl border border-theme-border w-full max-w-4xl max-h-[80vh] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
-          <div className="p-6 border-b border-[#A0AEC0]/20">
+          {/* Header */}{" "}
+          <div className="p-6 border-b border-theme-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <History className="w-6 h-6 text-[#00A99D]" />
-                <h2 className="text-2xl font-bold text-[#E1E6EB]">Merge History</h2>
+                {" "}
+                <History className="w-6 h-6 text-theme-primary" />
+                <h2 className="text-2xl font-bold text-theme-text">
+                  Merge History
+                </h2>
               </div>
               <div className="flex items-center gap-2">
+                {" "}
                 <button
                   onClick={loadHistory}
-                  className="p-2 text-[#A0AEC0] hover:text-[#00A99D] transition-colors"
+                  className="p-2 text-theme-text-secondary hover:text-theme-primary transition-colors"
                   title="Refresh"
                 >
                   <RefreshCw className="w-5 h-5" />
@@ -90,28 +98,29 @@ const MergeHistory = ({ isOpen, onClose }) => {
                 )}
                 <button
                   onClick={onClose}
-                  className="p-2 text-[#A0AEC0] hover:text-[#E1E6EB] transition-colors"
+                  className="p-2 text-theme-text-secondary hover:text-theme-text transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
           </div>
-
           {/* Content */}
           <div className="p-6 overflow-y-auto max-h-[60vh]">
             {loading ? (
               <div className="text-center py-12">
-                <RefreshCw className="w-8 h-8 text-[#00A99D] mx-auto mb-4 animate-spin" />
-                <p className="text-[#A0AEC0]">Loading history...</p>
+                {" "}
+                <RefreshCw className="w-8 h-8 text-theme-primary mx-auto mb-4 animate-spin" />
+                <p className="text-theme-text-secondary">Loading history...</p>
               </div>
             ) : history.length === 0 ? (
               <div className="text-center py-12">
-                <FolderOpen className="w-16 h-16 text-[#A0AEC0] mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-[#E1E6EB] mb-2">
+                {" "}
+                <FolderOpen className="w-16 h-16 text-theme-text-secondary mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-theme-text mb-2">
                   No merge history yet
                 </h3>
-                <p className="text-[#A0AEC0]">
+                <p className="text-theme-text-secondary">
                   Your completed PDF merges will appear here
                 </p>
               </div>
@@ -123,57 +132,69 @@ const MergeHistory = ({ isOpen, onClose }) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-[#1B212C] border border-[#A0AEC0]/20 rounded-xl p-4 hover:border-[#00A99D]/50 transition-colors"
+                    className="bg-theme-background border border-theme-border rounded-xl p-4 hover:border-theme-primary-opaque-50 transition-colors"
                   >
+                    {" "}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <FileText className="w-8 h-8 text-[#00A99D]" />
+                        {" "}
+                        <FileText className="w-8 h-8 text-theme-primary" />
                         <div>
-                          <h4 className="text-[#E1E6EB] font-semibold">
+                          <h4 className="text-theme-text font-semibold">
                             {item.fileName}.pdf
                           </h4>
-                          <div className="flex items-center gap-2 text-sm text-[#A0AEC0]">
+                          <div className="flex items-center gap-2 text-sm text-theme-text-secondary">
                             <Calendar className="w-4 h-4" />
                             <span>{formatDate(item.timestamp)}</span>
                           </div>
                         </div>
                       </div>
-                    </div>
-
+                    </div>{" "}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="text-center p-3 bg-[#151B24] rounded-lg">
-                        <div className="text-lg font-bold text-[#00A99D]">
+                      {" "}
+                      <div className="text-center p-3 bg-theme-secondary rounded-lg">
+                        <div className="text-lg font-bold text-theme-primary">
                           {item.fileCount}
                         </div>
-                        <div className="text-xs text-[#A0AEC0]">Files Merged</div>
+                        <div className="text-xs text-theme-text-secondary">
+                          Files Merged
+                        </div>
                       </div>
-                      <div className="text-center p-3 bg-[#151B24] rounded-lg">
-                        <div className="text-lg font-bold text-[#00A99D]">
+                      <div className="text-center p-3 bg-theme-secondary rounded-lg">
+                        <div className="text-lg font-bold text-theme-primary">
                           {formatFileSize(item.totalSize)}
                         </div>
-                        <div className="text-xs text-[#A0AEC0]">Total Size</div>
-                      </div>
-                      <div className="text-center p-3 bg-[#151B24] rounded-lg">
-                        <div className="text-lg font-bold text-[#00A99D]">
-                          {item.files?.reduce((sum, file) => sum + (file.pages || 1), 0) || 'N/A'}
+                        <div className="text-xs text-theme-text-secondary">
+                          Total Size
                         </div>
-                        <div className="text-xs text-[#A0AEC0]">Est. Pages</div>
                       </div>
-                    </div>
-
+                      <div className="text-center p-3 bg-theme-secondary rounded-lg">
+                        <div className="text-lg font-bold text-theme-primary">
+                          {item.files?.reduce(
+                            (sum, file) => sum + (file.pages || 1),
+                            0
+                          ) || "N/A"}
+                        </div>
+                        <div className="text-xs text-theme-text-secondary">
+                          Est. Pages
+                        </div>
+                      </div>
+                    </div>{" "}
                     {/* File List */}
                     {item.files && item.files.length > 0 && (
-                      <div className="border-t border-[#A0AEC0]/20 pt-3">
-                        <h5 className="text-sm font-medium text-[#E1E6EB] mb-2">
+                      <div className="border-t border-theme-border pt-3">
+                        <h5 className="text-sm font-medium text-theme-text mb-2">
                           Source Files:
                         </h5>
                         <div className="space-y-1">
                           {item.files.map((file, fileIndex) => (
                             <div
                               key={fileIndex}
-                              className="flex items-center justify-between text-xs text-[#A0AEC0] bg-[#151B24] rounded px-2 py-1"
+                              className="flex items-center justify-between text-xs text-theme-text-secondary bg-theme-secondary rounded px-2 py-1"
                             >
-                              <span className="truncate flex-1">{file.name}</span>
+                              <span className="truncate flex-1">
+                                {file.name}
+                              </span>
                               <span className="ml-2 flex-shrink-0">
                                 {formatFileSize(file.size)}
                               </span>

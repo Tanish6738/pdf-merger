@@ -699,7 +699,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                         },
                       }))
                     }
-                    className="w-4 h-4 text-theme-primary bg-hardcoded-1b212c border-theme-border rounded focus:ring-theme-primary focus:ring-2"
+                    className="w-4 h-4 text-theme-primary bg-theme-background border-theme-border rounded focus:ring-theme-primary focus:ring-2"
                   />
                   <span className="text-theme-text">
                     Preserve bookmarks in split files
@@ -979,7 +979,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                     className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${
                       isSelected
                         ? `${tool.bgColor} ${tool.borderColor} border-2`
-                        : "card-theme hover:border-hardcoded-00a99d-50"
+                        : "card-theme hover:border-theme-primary-opaque-50"
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -1035,8 +1035,8 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                   {...getRootProps()}
                   className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer ${
                     isDragActive
-                      ? "border-theme-primary bg-hardcoded-00a99d-10"
-                      : "border-theme-border hover:border-hardcoded-00a99d-50"
+                      ? "border-theme-primary bg-theme-primary-opaque-10"
+                      : "border-theme-border hover:border-theme-primary-opaque-50"
                   }`}
                 >
                   <input {...getInputProps()} />{" "}
@@ -1059,7 +1059,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                       {files.map((file, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-3 bg-hardcoded-1b212c border border-theme-border rounded-lg"
+                          className="flex items-center justify-between p-3 bg-theme-background border border-theme-border rounded-lg"
                         >
                           <div className="flex items-center gap-3">
                             {" "}
@@ -1114,7 +1114,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                     disabled={files.length === 0 || isProcessing}
                     className={`w-full px-6 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
                       files.length > 0 && !isProcessing
-                        ? "bg-theme-primary hover:bg-hardcoded-00a99d-90 text-white"
+                        ? "bg-theme-primary hover:bg-theme-primary-opaque-90 text-white"
                         : "bg-theme-border-opaque-20 text-theme-text-secondary cursor-not-allowed"
                     }`}
                   >
@@ -1235,7 +1235,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                         {result.success && (
                           <button
                             onClick={() => downloadResult(result)}
-                            className="px-4 py-2 bg-theme-primary hover:bg-hardcoded-00a99d-90 text-white rounded-lg transition-colors flex items-center gap-2"
+                            className="px-4 py-2 bg-theme-primary hover:bg-theme-primary-opaque-90 text-white rounded-lg transition-colors flex items-center gap-2"
                           >
                             <Download className="w-4 h-4" />
                             <span>Download All</span>
@@ -1256,7 +1256,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                                 onClick={() =>
                                   downloadAllSplitFiles(result.splitFiles)
                                 }
-                                className="px-2 py-1 bg-hardcoded-00a99d-20 hover:bg-hardcoded-00a99d-30 text-theme-primary rounded text-xs transition-colors"
+                                className="px-2 py-1 bg-theme-primary-opaque-20 hover:bg-theme-primary-opaque-30 text-theme-primary rounded text-xs transition-colors"
                               >
                                 Download All
                               </button>
@@ -1265,7 +1265,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                               {result.splitFiles.map((file, fileIndex) => (
                                 <div
                                   key={fileIndex}
-                                  className="flex items-center justify-between p-2 bg-hardcoded-1b212c rounded-lg hover:bg-theme-secondary-opaque-80 transition-colors"
+                                  className="flex items-center justify-between p-2 bg-theme-background rounded-lg hover:bg-theme-secondary-opaque-80 transition-colors"
                                 >
                                   <div className="flex items-center gap-2 flex-1 min-w-0">
                                     {" "}
@@ -1297,7 +1297,7 @@ const AdvancedPDFTools = ({ onNavigate }) => {
                                   </div>
                                   <button
                                     onClick={() => downloadSplitFile(file)}
-                                    className="px-2 py-1 bg-hardcoded-00a99d-20 hover:bg-hardcoded-00a99d-30 text-theme-primary rounded text-xs transition-colors flex items-center gap-1 flex-shrink-0 ml-2"
+                                    className="px-2 py-1 bg-theme-primary-opaque-20 hover:bg-theme-primary-opaque-30 text-theme-primary rounded text-xs transition-colors flex items-center gap-1 flex-shrink-0 ml-2"
                                     title={`Download ${file.fileName}`}
                                   >
                                     <Download className="w-3 h-3" />

@@ -22,13 +22,6 @@
   --motion-duration: 0.3s;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -183,6 +176,61 @@ body {
   opacity: 0.2;
 }
 
+/* Hover states for theme classes */
+.hover\:text-theme-primary:hover {
+  color: var(--color-primary);
+}
+
+.hover\:text-theme-text:hover {
+  color: var(--color-text);
+}
+
+.hover\:bg-theme-primary:hover {
+  background-color: var(--color-primary);
+}
+
+.hover\:bg-theme-primary-opaque-30:hover {
+  background-color: var(--color-primary);
+  opacity: 0.3;
+}
+
+.hover\:bg-theme-primary-opaque-90:hover {
+  background-color: var(--color-primary);
+  opacity: 0.9;
+}
+
+.hover\:border-theme-primary:hover {
+  border-color: var(--color-primary);
+}
+
+.hover\:border-theme-primary-opaque-50:hover {
+  border-color: var(--color-primary);
+  opacity: 0.5;
+}
+
+/* Additional opacity variants */
+/* Background opacity classes for text-secondary */
+.bg-theme-text-secondary-opaque-20 {
+  background-color: var(--color-textSecondary);
+  opacity: 0.2;
+}
+
+.hover\:bg-theme-text-secondary-opaque-20:hover {
+  background-color: var(--color-textSecondary);
+  opacity: 0.2;
+}
+
+/* Border opacity classes for primary */
+.border-theme-primary-opaque-20 {
+  border-color: var(--color-primary);
+  opacity: 0.2;
+}
+
+.border-theme-primary-opaque-50 {
+  border-color: var(--color-primary);
+  opacity: 0.5;
+}
+
 /* Button styles */
 .btn-primary {
   background-color: var(--color-primary);
@@ -273,6 +321,10 @@ body {
 
 .bg-hardcoded-00a99d-20 {
   background-color: rgba(0, 169, 157, 0.2);
+}
+
+.bg-hardcoded-a0aec0-20 {
+  background-color: rgba(160, 174, 192, 0.2);
 }
 
 /* Card and container styles */
