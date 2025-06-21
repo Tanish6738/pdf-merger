@@ -33,8 +33,7 @@ export const useTheme = () => {
   return context;
 };
 
-const themes = PreThemeshemes
-
+const themes = PreThemes 
 // Accessibility options
 const accessibilityOptions = {
   fontSize: {
